@@ -63,7 +63,7 @@ public class HomeActivity extends BaseActivity {
                 Toast.makeText(this, R.string.add_comment_for_album, Toast.LENGTH_SHORT).show();
                 break;
             case R.id.more:
-                Toast.makeText(this, "弹出更多菜单", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, R.string.show_more_menu_items, Toast.LENGTH_SHORT).show();
                 break;
             default:
                 break;
