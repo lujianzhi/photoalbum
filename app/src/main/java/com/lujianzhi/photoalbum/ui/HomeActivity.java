@@ -60,7 +60,7 @@ public class HomeActivity extends BaseActivity {
                 PhotoAlbumManager.getInstance().addPhotoAlbum(this, photoAlbumsList.size() + 1, "第一个相册", true, 1);
                 break;
             case R.id.comment:
-                Toast.makeText(this, "添加对相册的评论", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, R.string.add_comment_for_album, Toast.LENGTH_SHORT).show();
                 break;
             case R.id.more:
                 Toast.makeText(this, "弹出更多菜单", Toast.LENGTH_SHORT).show();
