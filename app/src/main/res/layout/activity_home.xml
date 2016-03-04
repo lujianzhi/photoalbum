@@ -1,0 +1,32 @@
+<?xml version="1.0"  encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:paddingLeft="@dimen/gap_5"
+                android:paddingRight="@dimen/gap_5"
+                android:background="@color/color12">
+
+    <include
+        android:id="@+id/top"
+        layout="@layout/top_layout"/>
+
+
+    <include
+        android:id="@+id/bottom"
+        layout="@layout/bottom_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"/>
+
+    <GridView
+        android:id="@+id/photo_album"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_above="@id/bottom"
+        android:layout_below="@id/top"
+        android:gravity="center"
+        android:horizontalSpacing="@dimen/gap_5"
+        android:numColumns="2"
+        android:verticalSpacing="@dimen/gap_5"/>
+
+</RelativeLayout>
