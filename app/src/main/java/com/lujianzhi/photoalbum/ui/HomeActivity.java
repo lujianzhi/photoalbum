@@ -21,7 +21,7 @@ import android.widget.Toast;
 
 import com.lujianzhi.photoalbum.R;
 import com.lujianzhi.photoalbum.entity.PhotoAlbum;
-import com.lujianzhi.photoalbum.https.PhotoAlbumManager;
+import com.lujianzhi.photoalbum.net.PhotoAlbumManager;
 import com.lujianzhi.photoalbum.ui.base.BaseActivity;
 import com.lujianzhi.photoalbum.utils.ViewHolder;
 import com.nostra13.universalimageloader.core.ImageLoader;
@@ -160,7 +160,7 @@ public class HomeActivity extends BaseActivity {
             TextView albumName = ViewHolder.get(convertView, R.id.name);
             ImageView albumCover = ViewHolder.get(convertView, R.id.cover);
             if (!TextUtils.isEmpty(photoAlbum.getCoverUrl())) {
-                ImageLoader.getInstance().displayImage(photoAlbum.getCoverUrl(),albumCover);
+                ImageLoader.getInstance().displayImage(photoAlbum.getCoverUrl(), albumCover);
             }
             albumName.setText(photoAlbum.getName());
             return convertView;
