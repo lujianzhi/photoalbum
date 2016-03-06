@@ -14,7 +14,7 @@ import android.widget.Toast;
 
 import com.lujianzhi.photoalbum.R;
 import com.lujianzhi.photoalbum.entity.Photo;
-import com.lujianzhi.photoalbum.https.PhotoAlbumManager;
+import com.lujianzhi.photoalbum.net.PhotoAlbumManager;
 import com.lujianzhi.photoalbum.ui.base.BaseActivity;
 
 import java.util.ArrayList;

@@ -14,7 +14,7 @@ import com.lujianzhi.photoalbum.utils.SharedPreferencesUtils;
  */
 public class SplashActivity extends Activity {
 
-    private Handler mHandler = new Handler() {
+    private  Handler mHandler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
             Intent intent;

@@ -19,7 +19,7 @@ import android.widget.Toast;
 import com.lujianzhi.photoalbum.R;
 import com.lujianzhi.photoalbum.entity.Photo;
 import com.lujianzhi.photoalbum.entity.PhotoAlbum;
-import com.lujianzhi.photoalbum.https.PhotoAlbumManager;
+import com.lujianzhi.photoalbum.net.PhotoAlbumManager;
 import com.lujianzhi.photoalbum.ui.base.BaseActivity;
 import com.lujianzhi.photoalbum.utils.ViewHolder;
 import com.lujianzhi.photoalbum.view.SateliteMenu;

@@ -5,8 +5,8 @@ import android.content.Context;
 import com.lujianzhi.photoalbum.R;
 import com.lujianzhi.photoalbum.entity.Photo;
 import com.lujianzhi.photoalbum.entity.PhotoAlbum;
-import com.lujianzhi.photoalbum.https.network.PhotoAlbumNetWork;
-import com.lujianzhi.photoalbum.https.parser.PhotoAlbumParser;
+import com.lujianzhi.photoalbum.net.network.PhotoAlbumNetWork;
+import com.lujianzhi.photoalbum.net.parser.PhotoAlbumParser;
 
 import java.util.ArrayList;
 

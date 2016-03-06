@@ -10,7 +10,7 @@ import android.widget.Toast;
 
 import com.lujianzhi.photoalbum.R;
 import com.lujianzhi.photoalbum.entity.User;
-import com.lujianzhi.photoalbum.https.UserManager;
+import com.lujianzhi.photoalbum.net.UserManager;
 import com.lujianzhi.photoalbum.ui.base.BaseActivity;
 import com.lujianzhi.photoalbum.utils.SharedPreferencesUtils;
 import com.lujianzhi.photoalbum.view.RoundImageView;

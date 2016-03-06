@@ -9,7 +9,7 @@ import android.widget.Toast;
 
 import com.lujianzhi.photoalbum.R;
 import com.lujianzhi.photoalbum.entity.User;
-import com.lujianzhi.photoalbum.https.UserManager;
+import com.lujianzhi.photoalbum.net.UserManager;
 
 import cn.bmob.v3.BmobUser;
 

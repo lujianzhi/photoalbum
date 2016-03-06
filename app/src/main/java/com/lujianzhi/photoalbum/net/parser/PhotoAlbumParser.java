@@ -1,4 +1,4 @@
-package com.lujianzhi.photoalbum.https.parser;
+package com.lujianzhi.photoalbum.net.parser;
 
 import android.content.Context;
 import android.widget.Toast;
