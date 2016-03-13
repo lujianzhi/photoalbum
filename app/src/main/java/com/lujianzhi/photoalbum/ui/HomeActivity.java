@@ -24,6 +24,7 @@ import com.lujianzhi.photoalbum.entity.PhotoAlbum;
 import com.lujianzhi.photoalbum.net.PhotoAlbumManager;
 import com.lujianzhi.photoalbum.ui.base.BaseActivity;
 import com.lujianzhi.photoalbum.utils.ViewHolder;
+import com.lujianzhi.photoalbum.view.MyAddAlbumDialog;
 import com.nostra13.universalimageloader.core.ImageLoader;
 
 import java.util.ArrayList;
@@ -40,6 +41,7 @@ public class HomeActivity extends BaseActivity {
             isFinish = false;
         }
     };
+    private PhotoAlbumAdapter adapter;
 
     @Override
     public void onClick(View v) {
@@ -48,16 +50,10 @@ public class HomeActivity extends BaseActivity {
                 startActivity(new Intent(this, UserCenterActivity.class));
                 break;
             case R.id.back:
-                if (isFinish) {
-                    finish();
-                } else {
-                    Toast.makeText(this, R.string.confirm_logout, Toast.LENGTH_SHORT).show();
-                    isFinish = true;
-                    handler.sendEmptyMessageDelayed(0, 2000);
-                }
+                isExit();
                 break;
             case R.id.add:
-                PhotoAlbumManager.getInstance().addPhotoAlbum(this, photoAlbumsList.size() + 1, "第一个相册", true, 1);
+                showAddPhotoAlbum();
                 break;
             case R.id.comment:
                 Toast.makeText(this, R.string.add_comment_for_album, Toast.LENGTH_SHORT).show();
@@ -86,8 +82,8 @@ public class HomeActivity extends BaseActivity {
     @Override
     protected void initViews() {
         photoAlbumView = (GridView) findViewById(R.id.photo_album);
-        PhotoAlbumAdapter adapter = new PhotoAlbumAdapter();
-        adapter.setData(PhotoAlbumManager.getInstance().getPhtotAlbum(this));
+        adapter = new PhotoAlbumAdapter();
+        PhotoAlbumManager.getInstance().getPhotoAlbum(this, adapter);
         photoAlbumView.setSelector(new ColorDrawable(Color.TRANSPARENT));
         photoAlbumView.setAdapter(adapter);
         photoAlbumView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -130,7 +126,34 @@ public class HomeActivity extends BaseActivity {
     protected void initData() {
     }
 
-    private class PhotoAlbumAdapter extends BaseAdapter {
+    private void showAddPhotoAlbum(){
+        final MyAddAlbumDialog dialog = new MyAddAlbumDialog(this);
+        dialog.setPositiveClickListener(new MyAddAlbumDialog.IMyClickListener() {
+            @Override
+            public void onClick() {
+                PhotoAlbumManager.getInstance().addPhotoAlbum(HomeActivity.this, photoAlbumsList.size() + 1, dialog.getAddAlbumName(), dialog.getAddAlbumType());
+                PhotoAlbumManager.getInstance().getPhotoAlbum(HomeActivity.this, adapter);
+            }
+        });
+        dialog.show();
+    }
+
+    @Override
+    public void onBackPressed() {
+        isExit();
+    }
+
+    private void isExit(){
+        if (isFinish) {
+            finish();
+        } else {
+            Toast.makeText(this, R.string.confirm_logout, Toast.LENGTH_SHORT).show();
+            isFinish = true;
+            handler.sendEmptyMessageDelayed(0, 2000);
+        }
+    }
+
+    public class PhotoAlbumAdapter extends BaseAdapter {
 
         public void setData(List<PhotoAlbum> list) {
             photoAlbumsList = list;

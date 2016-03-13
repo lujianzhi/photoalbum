@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_marginLeft="@dimen/gap_30"
+    android:layout_marginRight="@dimen/gap_30"
+    android:background="@drawable/dialog_round_corner"
+    android:gravity="center"
+    android:paddingTop="@dimen/gap_10">
+
+    <LinearLayout
+        android:id="@+id/album_name_area"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/gap_30"
+        android:layout_marginLeft="@dimen/gap_10"
+        android:layout_marginRight="@dimen/gap_10"
+        android:gravity="center_vertical">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="@dimen/gap_30"
+            android:gravity="center"
+            android:text="@string/photoAlbum_name"
+            android:textSize="@dimen/font_17" />
+
+        <EditText
+            android:id="@+id/album_name"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/gap_30"
+            android:layout_marginLeft="@dimen/gap_20"
+            android:background="@null"
+            android:hint="@string/photoAlbum_insert_album_name"
+            android:textSize="@dimen/font_15" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/album_public_area"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/gap_30"
+        android:layout_below="@id/album_name_area"
+        android:layout_marginLeft="@dimen/gap_10"
+        android:layout_marginRight="@dimen/gap_10"
+        android:layout_marginTop="@dimen/gap_10"
+        android:gravity="center_vertical">
+
+        <RadioGroup
+            android:id="@+id/radio_group"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <RadioButton
+            android:id="@+id/album_public"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/photoAlbum_public"/>
+
+            <RadioButton
+                android:id="@+id/album_private"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/photoAlbum_private"/>
+
+        </RadioGroup>
+
+    </LinearLayout>
+
+    <View
+        android:id="@+id/divider"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/px_1"
+        android:layout_below="@id/album_public_area"
+        android:layout_marginTop="@dimen/gap_10"
+        android:background="@color/color10" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/gap_40"
+        android:layout_below="@id/divider">
+
+        <TextView
+            android:id="@+id/add"
+            android:layout_width="@dimen/gap_0"
+            android:layout_height="@dimen/gap_30"
+            android:layout_marginTop="@dimen/gap_5"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:text="@string/photoAlbum_add"
+            android:textColor="@color/color22"
+            android:textSize="@dimen/font_17" />
+
+        <View
+            android:layout_width="@dimen/px_1"
+            android:layout_height="match_parent"
+            android:background="@color/color10" />
+
+        <TextView
+            android:id="@+id/cancel"
+            android:layout_width="@dimen/gap_0"
+            android:layout_height="@dimen/gap_30"
+            android:layout_marginTop="@dimen/gap_5"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:text="@string/cancel"
+            android:textColor="@color/color22"
+            android:textSize="@dimen/font_17" />
+    </LinearLayout>
+
+</RelativeLayout>

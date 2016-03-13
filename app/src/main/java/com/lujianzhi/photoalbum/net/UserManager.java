@@ -5,7 +5,7 @@ import android.widget.Toast;
 
 import com.lujianzhi.photoalbum.R;
 import com.lujianzhi.photoalbum.entity.User;
-import com.lujianzhi.photoalbum.utils.MyRegistDialog;
+import com.lujianzhi.photoalbum.view.MyRegisterDialog;
 
 import cn.bmob.v3.BmobUser;
 import cn.bmob.v3.listener.SaveListener;
@@ -52,7 +52,7 @@ public class UserManager {
      * @param context
      * @param user
      */
-    public void registerUser(final Context context, BmobUser user, final MyRegistDialog dialog) {
+    public void registerUser(final Context context, BmobUser user, final MyRegisterDialog dialog) {
         user.signUp(context, new SaveListener() {
             @Override
             public void onSuccess() {

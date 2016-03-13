@@ -1,5 +1,8 @@
 package com.lujianzhi.photoalbum.entity;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 import cn.bmob.v3.BmobObject;
 
 /**
@@ -13,7 +16,7 @@ import cn.bmob.v3.BmobObject;
  * <p/>
  * Created by lujianzhi on 2016/1/21.
  */
-public class PhotoAlbum extends BmobObject {
+public class PhotoAlbum extends BmobObject implements Parcelable{
 
     public static final String TABLENAME = "album";
 
@@ -28,14 +31,9 @@ public class PhotoAlbum extends BmobObject {
     private String name;
 
     /**
-     * 是否公开  true/false
-     */
-    private Boolean isPublic;
-
-    /**
      * 相册类型
-     * 0 --> 公开
-     * 1 --> 隐私
+     * 0 --> 隐私
+     * 1 --> 公开
      */
     private Integer type;
 
@@ -58,15 +56,32 @@ public class PhotoAlbum extends BmobObject {
         this.setTableName(PhotoAlbum.TABLENAME);
     }
 
-    public PhotoAlbum(Integer id, String name, Boolean isPublic, Integer type, String coverUrl, Integer count, String comment) {
+    public PhotoAlbum(Integer id, String name, Integer type, String coverUrl, Integer count, String comment) {
         this.id = id;
         this.name = name;
-        this.isPublic = isPublic;
         this.type = type;
         this.coverUrl = coverUrl;
         this.count = count;
         this.comment = comment;
     }
+
+    protected PhotoAlbum(Parcel in) {
+        name = in.readString();
+        coverUrl = in.readString();
+        comment = in.readString();
+    }
+
+    public static final Creator<PhotoAlbum> CREATOR = new Creator<PhotoAlbum>() {
+        @Override
+        public PhotoAlbum createFromParcel(Parcel in) {
+            return new PhotoAlbum(in);
+        }
+
+        @Override
+        public PhotoAlbum[] newArray(int size) {
+            return new PhotoAlbum[size];
+        }
+    };
 
     public Integer getId() {
         return id;
@@ -82,14 +97,6 @@ public class PhotoAlbum extends BmobObject {
 
     public void setName(String name) {
         this.name = name;
-    }
-
-    public Boolean isPublic() {
-        return isPublic;
-    }
-
-    public void setIsPublic(Boolean isPublic) {
-        this.isPublic = isPublic;
     }
 
     public Integer getType() {
@@ -129,10 +136,21 @@ public class PhotoAlbum extends BmobObject {
         return "PhotoAlbum{" +
                 "id='" + id + '\'' +
                 ", name='" + name + '\'' +
-                ", isPublic=" + isPublic +
                 ", type='" + type + '\'' +
                 ", coverUrl='" + coverUrl + '\'' +
                 ", count=" + count +
                 '}';
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(name);
+        dest.writeString(coverUrl);
+        dest.writeString(comment);
     }
 }

@@ -13,11 +13,10 @@ import cn.bmob.v3.listener.SaveListener;
  */
 public class PhotoAlbumNetWork {
 
-    public void addPhotoAlbum(final Context context, int id, String tableName, boolean isPublic, int type) {
+    public void addPhotoAlbum(final Context context, int id, String tableName, int type) {
         PhotoAlbum photoAlbum = new PhotoAlbum();
         photoAlbum.setId(id);
         photoAlbum.setName(tableName);
-        photoAlbum.setIsPublic(isPublic);
         photoAlbum.setType(type);
         photoAlbum.save(context, new SaveListener() {
             @Override

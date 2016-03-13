@@ -43,5 +43,13 @@
     <!--Exceptions-->
     <string name="photoAlbum_parse_error">相册数据解析错误</string>
 
+    <!-- 相册相关-->
+    <string name="photoAlbum_name">相册名</string>
+    <string name="photoAlbum_is_public">是否公开</string>
+    <string name="photoAlbum_add">新增</string>
+    <string name="photoAlbum_insert_album_name">请输入相册名</string>
+    <string name="photoAlbum_public">公开</string>
+    <string name="photoAlbum_private">不公开</string>
+
 
 </resources>

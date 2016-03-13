@@ -10,7 +10,7 @@ import com.lujianzhi.photoalbum.R;
 import com.lujianzhi.photoalbum.entity.User;
 import com.lujianzhi.photoalbum.net.UserManager;
 import com.lujianzhi.photoalbum.ui.base.BaseActivity;
-import com.lujianzhi.photoalbum.utils.MyRegistDialog;
+import com.lujianzhi.photoalbum.view.MyRegisterDialog;
 import com.lujianzhi.photoalbum.utils.SharedPreferencesUtils;
 
 import cn.bmob.v3.listener.SaveListener;
@@ -88,7 +88,7 @@ public class LoginActivity extends BaseActivity {
     }
 
     private void showDialog() {
-        MyRegistDialog dialog = new MyRegistDialog(this, R.style.emptyDialog);
+        MyRegisterDialog dialog = new MyRegisterDialog(this, R.style.emptyDialog);
         dialog.show();
     }
 

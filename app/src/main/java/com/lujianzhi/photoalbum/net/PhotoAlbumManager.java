@@ -7,6 +7,7 @@ import com.lujianzhi.photoalbum.entity.Photo;
 import com.lujianzhi.photoalbum.entity.PhotoAlbum;
 import com.lujianzhi.photoalbum.net.network.PhotoAlbumNetWork;
 import com.lujianzhi.photoalbum.net.parser.PhotoAlbumParser;
+import com.lujianzhi.photoalbum.ui.HomeActivity;
 
 import java.util.ArrayList;
 
@@ -37,18 +38,12 @@ public class PhotoAlbumManager {
         return instance;
     }
 
-    public void addPhotoAlbum(Context context, int id, String tableName, boolean isPublic, int type) {
-        photoAlbumNetWork.addPhotoAlbum(context, id, tableName, isPublic, type);
+    public void addPhotoAlbum(Context context, int id, String tableName, int type) {
+        photoAlbumNetWork.addPhotoAlbum(context, id, tableName, type);
     }
 
-    public ArrayList<PhotoAlbum> getPhtotAlbum(Context context) {
-        /**
-         * 相册假数据
-         */
-//        for (int i = 0; i < 5; i++) {
-//            photoAlbums.add(new PhotoAlbum(i, "生活" + i, true, 1, "", i, "评论:还不错"));
-//        }
-        return photoAlbumParser.getPhotoAlbum(context);
+    public ArrayList<PhotoAlbum> getPhotoAlbum(Context context,HomeActivity.PhotoAlbumAdapter adapter) {
+        return photoAlbumParser.getPhotoAlbum(context,adapter);
     }
 
     public ArrayList<Photo> getPhoto() {
