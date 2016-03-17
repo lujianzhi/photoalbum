@@ -15,6 +15,8 @@ import cn.bmob.v3.BmobObject;
  */
 public class Photo extends BmobObject {
 
+    public static final String TABLENAME = "photo";
+
     /**
      * 照片id
      */
@@ -24,11 +26,6 @@ public class Photo extends BmobObject {
      * 照片名
      */
     private String name;
-
-    /**
-     * 照片类型
-     */
-    private String type;
 
     /**
      * 照片url
@@ -41,21 +38,21 @@ public class Photo extends BmobObject {
     private String comment;
 
     /**
-     * 资源id
+     * 属于哪个相册
      */
-    private Integer resId;
+    private Integer belongId;
 
     public Photo() {
-
+        this.setTableName(Photo.TABLENAME);
     }
 
-    public Photo(Integer id, String name, String type, String photoUrl, Integer resId, String comment) {
+    public Photo(Integer id, String name, String photoUrl, String comment, Integer belongId) {
+        this.setTableName(Photo.TABLENAME);
         this.id = id;
         this.name = name;
-        this.type = type;
         this.photoUrl = photoUrl;
-        this.resId = resId;
         this.comment = comment;
+        this.belongId = belongId;
     }
 
     public Integer getId() {
@@ -74,14 +71,6 @@ public class Photo extends BmobObject {
         this.name = name;
     }
 
-    public String getType() {
-        return type;
-    }
-
-    public void setType(String type) {
-        this.type = type;
-    }
-
     public String getPhotoUrl() {
         return photoUrl;
     }
@@ -98,11 +87,11 @@ public class Photo extends BmobObject {
         this.comment = comment;
     }
 
-    public Integer getResId() {
-        return resId;
+    public Integer getBelongId() {
+        return belongId;
     }
 
-    public void setResId(Integer resId) {
-        this.resId = resId;
+    public void setBelongId(Integer belongId) {
+        this.belongId = belongId;
     }
 }

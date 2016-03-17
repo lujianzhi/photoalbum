@@ -14,7 +14,6 @@ import android.widget.Toast;
 
 import com.lujianzhi.photoalbum.R;
 import com.lujianzhi.photoalbum.entity.Photo;
-import com.lujianzhi.photoalbum.net.PhotoAlbumManager;
 import com.lujianzhi.photoalbum.ui.base.BaseActivity;
 
 import java.util.ArrayList;
@@ -77,7 +76,7 @@ public class PhotoActivity extends BaseActivity {
         photoImageView = (ImageView) findViewById(R.id.photo);
         photoArea = (LinearLayout) findViewById(R.id.photo_area);
         comments = (FrameLayout) findViewById(R.id.comments);
-        photoImageView.setImageResource(photoList.get(photoPosition).getResId());
+//        photoImageView.setImageResource(photoList.get(photoPosition).getResId());
         photoArea.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
@@ -151,7 +150,7 @@ public class PhotoActivity extends BaseActivity {
 
     private void changePhoto(Photo photo, int position) {
         photo = photoList.get(position);
-        photoImageView.setImageResource(photo.getResId());
+//        photoImageView.setImageResource(photo.getResId());
         top_title.setText(photo.getName());
         photoImageView.startAnimation(AnimationUtils.loadAnimation(this, R.anim.photo_change));
         comments.removeAllViews();
@@ -176,6 +175,5 @@ public class PhotoActivity extends BaseActivity {
 
     @Override
     protected void initData() {
-        photoList = PhotoAlbumManager.getInstance().getPhoto();
     }
 }

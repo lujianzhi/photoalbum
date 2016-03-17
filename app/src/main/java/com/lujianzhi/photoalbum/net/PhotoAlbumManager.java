@@ -2,12 +2,12 @@ package com.lujianzhi.photoalbum.net;
 
 import android.content.Context;
 
-import com.lujianzhi.photoalbum.R;
 import com.lujianzhi.photoalbum.entity.Photo;
 import com.lujianzhi.photoalbum.entity.PhotoAlbum;
 import com.lujianzhi.photoalbum.net.network.PhotoAlbumNetWork;
 import com.lujianzhi.photoalbum.net.parser.PhotoAlbumParser;
 import com.lujianzhi.photoalbum.ui.HomeActivity;
+import com.lujianzhi.photoalbum.ui.PhotoAlbumActivity;
 
 import java.util.ArrayList;
 
@@ -42,29 +42,13 @@ public class PhotoAlbumManager {
         photoAlbumNetWork.addPhotoAlbum(context, id, tableName, type);
     }
 
-    public ArrayList<PhotoAlbum> getPhotoAlbum(Context context,HomeActivity.PhotoAlbumAdapter adapter) {
-        return photoAlbumParser.getPhotoAlbum(context,adapter);
+    public void getPhotoAlbum(Context context,HomeActivity.PhotoAlbumAdapter adapter) {
+        photoAlbumParser.getPhotoAlbum(context,adapter);
     }
 
-    public ArrayList<Photo> getPhoto() {
+    public void getPhoto(Context context,PhotoAlbumActivity.MyAdapter adapter,int albumId) {
         clearPhoto();
-        Photo photo1 = new Photo(1, "第1张照片", "1", "", R.drawable.img_1, "评论:帅气啊");
-        Photo photo2 = new Photo(2, "第2张照片", "2", "", R.drawable.img_2, "评论:那是手机么请问");
-        Photo photo3 = new Photo(3, "第3张照片", "3", "", R.drawable.img_3, "评论:萝莉诶");
-        Photo photo4 = new Photo(4, "第4张照片", "4", "", R.drawable.splash_pic, "评论:这个是什么鬼");
-        Photo photo5 = new Photo(5, "第5张照片", "5", "", R.drawable.img_5, "评论:好像很屌的样子");
-        Photo photo6 = new Photo(6, "第6张照片", "6", "", R.drawable.img_6, "评论:妹子听什么歌呢");
-        Photo photo7 = new Photo(7, "第7张照片", "7", "", R.drawable.img_7, "评论:冷不冷");
-        Photo photo8 = new Photo(8, "第8张照片", "8", "", R.drawable.img_8, "评论:万年剪刀手");
-        photos.add(photo1);
-        photos.add(photo2);
-        photos.add(photo3);
-        photos.add(photo4);
-        photos.add(photo5);
-        photos.add(photo6);
-        photos.add(photo7);
-        photos.add(photo8);
-        return photos;
+        photoAlbumParser.getPhoto(context, adapter, albumId);
     }
 
     private void clearPhoto() {

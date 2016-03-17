@@ -3,6 +3,7 @@ package com.lujianzhi.photoalbum;
 import android.app.Application;
 
 import com.lujianzhi.photoalbum.utils.ConstantsUtil;
+import com.lujianzhi.photoalbum.utils.ToastUtils;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
 
@@ -32,6 +33,11 @@ public class MyApplication extends Application {
          */
         ImageLoaderConfiguration configuration = ImageLoaderConfiguration.createDefault(this);
         ImageLoader.getInstance().init(configuration);
+
+        /**
+         * 初始化ToastUtils
+         */
+        ToastUtils.init(this);
     }
 
 }

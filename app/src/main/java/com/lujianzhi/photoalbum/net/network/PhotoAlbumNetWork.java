@@ -3,8 +3,13 @@ package com.lujianzhi.photoalbum.net.network;
 import android.content.Context;
 import android.widget.Toast;
 
+import com.lidroid.xutils.http.RequestParams;
+import com.lidroid.xutils.http.client.HttpRequest;
 import com.lujianzhi.photoalbum.R;
+import com.lujianzhi.photoalbum.config.NetWorkConfig;
 import com.lujianzhi.photoalbum.entity.PhotoAlbum;
+import com.lujianzhi.photoalbum.net.networktask.INetWorkListener;
+import com.lujianzhi.photoalbum.net.networktask.NetWorkTask;
 
 import cn.bmob.v3.listener.SaveListener;
 
@@ -13,6 +18,29 @@ import cn.bmob.v3.listener.SaveListener;
  */
 public class PhotoAlbumNetWork {
 
+    public void addPhotoAlbum(INetWorkListener netWorkListener){
+        NetWorkTask netWorkTask = new NetWorkTask() {
+            @Override
+            public HttpRequest.HttpMethod getHttpMethod() {
+                return HttpRequest.HttpMethod.POST;
+            }
+
+            @Override
+            public String getUrl() {
+                return NetWorkConfig.getHttpApiPath()+"/";
+            }
+
+            @Override
+            public RequestParams getRequestParams() {
+                // 需要的参数
+                return null;
+            }
+        };
+        netWorkTask.setNetWorkListener(netWorkListener);
+        netWorkTask.sendHttpRequest();
+    }
+
+    @Deprecated
     public void addPhotoAlbum(final Context context, int id, String tableName, int type) {
         PhotoAlbum photoAlbum = new PhotoAlbum();
         photoAlbum.setId(id);

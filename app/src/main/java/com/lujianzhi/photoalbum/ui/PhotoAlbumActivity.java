@@ -1,5 +1,6 @@
 package com.lujianzhi.photoalbum.ui;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
@@ -23,6 +24,7 @@ import com.lujianzhi.photoalbum.net.PhotoAlbumManager;
 import com.lujianzhi.photoalbum.ui.base.BaseActivity;
 import com.lujianzhi.photoalbum.utils.ViewHolder;
 import com.lujianzhi.photoalbum.view.SateliteMenu;
+import com.nostra13.universalimageloader.core.ImageLoader;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -37,6 +39,9 @@ public class PhotoAlbumActivity extends BaseActivity {
     private List<Photo> photoList = new ArrayList<Photo>();
     private PhotoAlbum photoAlbum;
     private String albumName;
+    private int albumId;
+
+    public static final int SYSTEM_GARRLY_REQUEST_CODE = 100;
 
     @Override
     protected void initTopViews() {
@@ -52,21 +57,9 @@ public class PhotoAlbumActivity extends BaseActivity {
 
     @Override
     protected void initViews() {
-        /**
-         * 卫星菜单
-         */
-        //        mSateliteMenu = (SateliteMenu) findViewById(R.id.bottom).findViewById(R.id.sm_menu);
-        //
-        //        mSateliteMenu.setOnMenuItemClickListener(new SateliteMenu.onMenuItemClickListener() {
-        //            @Override
-        //            public void onItemClick(View view, int position) {
-        //                Toast.makeText(getApplicationContext(), view.getTag().toString(), Toast.LENGTH_SHORT).show();
-        //            }
-        //        });
-
         photosView = (GridView) findViewById(R.id.photos);
         MyAdapter adapter = new MyAdapter();
-        adapter.setData(photoList);
+        PhotoAlbumManager.getInstance().getPhoto(this, adapter, albumId);
         photosView.setAdapter(adapter);
         photosView.setSelector(new ColorDrawable(Color.TRANSPARENT));
         photosView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -99,11 +92,11 @@ public class PhotoAlbumActivity extends BaseActivity {
     protected void initIntentData() {
         Bundle data = getIntent().getBundleExtra("data");
         albumName = data.getString("albumName");
+        albumId = data.getInt("albumId");
     }
 
     @Override
     protected void initData() {
-        photoList = PhotoAlbumManager.getInstance().getPhoto();
     }
 
     @Override
@@ -116,6 +109,20 @@ public class PhotoAlbumActivity extends BaseActivity {
         return null;
     }
 
+    private void addPhoto() {
+        Intent systemGalleryIntent = new Intent(Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+        startActivityForResult(systemGalleryIntent, PhotoAlbumActivity.SYSTEM_GARRLY_REQUEST_CODE);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (requestCode == PhotoAlbumActivity.SYSTEM_GARRLY_REQUEST_CODE && resultCode == Activity.RESULT_OK && data != null) {
+            // TODO 选中图片以后上传图片
+        }
+    }
+
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
@@ -126,7 +133,7 @@ public class PhotoAlbumActivity extends BaseActivity {
                 finish();
                 break;
             case R.id.add:
-                Toast.makeText(this, "新增相册", Toast.LENGTH_SHORT).show();
+                addPhoto();
                 break;
             case R.id.comment:
                 Toast.makeText(this, "添加对相册的评论", Toast.LENGTH_SHORT).show();
@@ -139,7 +146,7 @@ public class PhotoAlbumActivity extends BaseActivity {
         }
     }
 
-    private class MyAdapter extends BaseAdapter {
+    public class MyAdapter extends BaseAdapter {
 
         public void setData(List<Photo> photos) {
             photoList = photos;
@@ -167,8 +174,7 @@ public class PhotoAlbumActivity extends BaseActivity {
             }
             Photo photo = photoList.get(position);
             ImageView photoView = ViewHolder.get(convertView, R.id.photo);
-            // TODO 以后需换成图片的url地址
-            photoView.setImageResource(photo.getResId());
+            ImageLoader.getInstance().displayImage(photo.getPhotoUrl(), photoView);
             return convertView;
         }
     }

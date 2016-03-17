@@ -51,5 +51,9 @@
     <string name="photoAlbum_public">公开</string>
     <string name="photoAlbum_private">不公开</string>
 
+    <!-- 网络请求-->
+    <string name="net_request_failure">网络请求失败</string>
+
+
 
 </resources>

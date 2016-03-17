@@ -93,6 +93,7 @@ public class HomeActivity extends BaseActivity {
                 Intent intent = new Intent(HomeActivity.this, PhotoAlbumActivity.class);
                 Bundle data = new Bundle();
                 data.putString("albumName", photoAlbum.getName());
+                data.putInt("albumId",photoAlbum.getId());
                 intent.putExtra("data", data);
                 startActivity(intent);
             }
@@ -184,6 +185,9 @@ public class HomeActivity extends BaseActivity {
             ImageView albumCover = ViewHolder.get(convertView, R.id.cover);
             if (!TextUtils.isEmpty(photoAlbum.getCoverUrl())) {
                 ImageLoader.getInstance().displayImage(photoAlbum.getCoverUrl(), albumCover);
+            }
+            if(photoAlbum.getType() == 1){
+                albumName.setTextColor(Color.RED);
             }
             albumName.setText(photoAlbum.getName());
             return convertView;
