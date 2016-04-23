@@ -20,7 +20,6 @@ import android.widget.Toast;
 import com.lujianzhi.photoalbum.R;
 import com.lujianzhi.photoalbum.entity.Photo;
 import com.lujianzhi.photoalbum.entity.PhotoAlbum;
-import com.lujianzhi.photoalbum.net.PhotoAlbumManager;
 import com.lujianzhi.photoalbum.ui.base.BaseActivity;
 import com.lujianzhi.photoalbum.utils.ViewHolder;
 import com.lujianzhi.photoalbum.view.SateliteMenu;
@@ -59,7 +58,7 @@ public class PhotoAlbumActivity extends BaseActivity {
     protected void initViews() {
         photosView = (GridView) findViewById(R.id.photos);
         MyAdapter adapter = new MyAdapter();
-        PhotoAlbumManager.getInstance().getPhoto(this, adapter, albumId);
+//        PhotoAlbumManager.getInstance().getPhoto(this, adapter, albumId);
         photosView.setAdapter(adapter);
         photosView.setSelector(new ColorDrawable(Color.TRANSPARENT));
         photosView.setOnItemClickListener(new AdapterView.OnItemClickListener() {

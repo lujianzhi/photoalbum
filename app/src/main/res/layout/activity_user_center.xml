@@ -38,7 +38,7 @@
             android:textSize="@dimen/font_20" />
 
         <TextView
-            android:id="@+id/phone_number"
+            android:id="@+id/userName"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_below="@id/nick_name"

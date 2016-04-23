@@ -1,26 +1,13 @@
 package com.lujianzhi.photoalbum.entity;
 
-import cn.bmob.v3.BmobObject;
+import java.util.List;
 
-/**
- * Bmob存储的数据是建立在BmobObject基础上的，所以任何要保存的数据对象必须继承自BmobObject类。
- * BmobObject类本身包含objectId、createdAt、updatedAt、ACL四个默认的属性，
- * objectId是数据的唯一标示，相当于数据库中表的主键，createdAt是数据的创建时间，updatedAt是数据的最后修改时间，ACL是数据的操作权限。
- * <p/>
- * 尽可能使用Integer、Boolean，而不是int、boolean，也就是选择包装类，而不是使用基本数据类型
- * <p/>
- * JavaBean不需要对objectId、createdAt、updatedAt、ACL四个属性进行定义。
- * <p/>
- * Created by lujianzhi on 2016/1/22.
- */
-public class Photo extends BmobObject {
-
-    public static final String TABLENAME = "photo";
+public class Photo{
 
     /**
      * 照片id
      */
-    private Integer id;
+    private int id;
 
     /**
      * 照片名
@@ -35,19 +22,18 @@ public class Photo extends BmobObject {
     /**
      * 照片评论
      */
-    private String comment;
+    private List<Comment> comment;
 
     /**
      * 属于哪个相册
      */
-    private Integer belongId;
+    private int belongId;
 
-    public Photo() {
-        this.setTableName(Photo.TABLENAME);
+    public Photo(){
+
     }
 
-    public Photo(Integer id, String name, String photoUrl, String comment, Integer belongId) {
-        this.setTableName(Photo.TABLENAME);
+    public Photo(int id, String name, String photoUrl, List<Comment> comment, int belongId) {
         this.id = id;
         this.name = name;
         this.photoUrl = photoUrl;
@@ -55,11 +41,11 @@ public class Photo extends BmobObject {
         this.belongId = belongId;
     }
 
-    public Integer getId() {
+    public int getId() {
         return id;
     }
 
-    public void setId(Integer id) {
+    public void setId(int id) {
         this.id = id;
     }
 
@@ -79,19 +65,19 @@ public class Photo extends BmobObject {
         this.photoUrl = photoUrl;
     }
 
-    public String getComment() {
+    public List<Comment> getComment() {
         return comment;
     }
 
-    public void setComment(String comment) {
+    public void setComment(List<Comment> comment) {
         this.comment = comment;
     }
 
-    public Integer getBelongId() {
+    public int getBelongId() {
         return belongId;
     }
 
-    public void setBelongId(Integer belongId) {
+    public void setBelongId(int belongId) {
         this.belongId = belongId;
     }
 }

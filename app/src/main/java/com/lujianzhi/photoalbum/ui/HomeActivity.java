@@ -19,10 +19,14 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.lidroid.xutils.exception.HttpException;
+import com.lidroid.xutils.http.ResponseInfo;
 import com.lujianzhi.photoalbum.R;
 import com.lujianzhi.photoalbum.entity.PhotoAlbum;
 import com.lujianzhi.photoalbum.net.PhotoAlbumManager;
+import com.lujianzhi.photoalbum.net.networktask.INetWorkListener;
 import com.lujianzhi.photoalbum.ui.base.BaseActivity;
+import com.lujianzhi.photoalbum.utils.LogUtils;
 import com.lujianzhi.photoalbum.utils.ViewHolder;
 import com.lujianzhi.photoalbum.view.MyAddAlbumDialog;
 import com.nostra13.universalimageloader.core.ImageLoader;
@@ -31,6 +35,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class HomeActivity extends BaseActivity {
+    private final String TAG = HomeActivity.class.getName();
 
     private List<PhotoAlbum> photoAlbumsList = new ArrayList<PhotoAlbum>();
     private GridView photoAlbumView;
@@ -83,7 +88,7 @@ public class HomeActivity extends BaseActivity {
     protected void initViews() {
         photoAlbumView = (GridView) findViewById(R.id.photo_album);
         adapter = new PhotoAlbumAdapter();
-        PhotoAlbumManager.getInstance().getPhotoAlbum(this, adapter);
+//        PhotoAlbumManager.getInstance().getPhotoAlbum(this, adapter);
         photoAlbumView.setSelector(new ColorDrawable(Color.TRANSPARENT));
         photoAlbumView.setAdapter(adapter);
         photoAlbumView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -93,7 +98,7 @@ public class HomeActivity extends BaseActivity {
                 Intent intent = new Intent(HomeActivity.this, PhotoAlbumActivity.class);
                 Bundle data = new Bundle();
                 data.putString("albumName", photoAlbum.getName());
-                data.putInt("albumId",photoAlbum.getId());
+                data.putInt("albumId", photoAlbum.getId());
                 intent.putExtra("data", data);
                 startActivity(intent);
             }
@@ -127,13 +132,29 @@ public class HomeActivity extends BaseActivity {
     protected void initData() {
     }
 
-    private void showAddPhotoAlbum(){
+    private void showAddPhotoAlbum() {
         final MyAddAlbumDialog dialog = new MyAddAlbumDialog(this);
         dialog.setPositiveClickListener(new MyAddAlbumDialog.IMyClickListener() {
             @Override
             public void onClick() {
-                PhotoAlbumManager.getInstance().addPhotoAlbum(HomeActivity.this, photoAlbumsList.size() + 1, dialog.getAddAlbumName(), dialog.getAddAlbumType());
-                PhotoAlbumManager.getInstance().getPhotoAlbum(HomeActivity.this, adapter);
+                PhotoAlbumManager.getInstance().addPhotoAlbumRequest(dialog.getAddAlbumName(), dialog.getAddAlbumType(), new INetWorkListener() {
+                    @Override
+                    public <T> void onSuccess(ResponseInfo<T> responseInfo) {
+                        String responseStr = responseInfo.result.toString();
+                        LogUtils.i(TAG, responseStr);
+
+                        if (PhotoAlbumManager.getInstance().parserAddAlbum(responseStr) == 0) {
+
+                        }
+
+                    }
+
+                    @Override
+                    public void onFailure(HttpException error, String msg) {
+
+                    }
+                });
+
             }
         });
         dialog.show();
@@ -144,7 +165,7 @@ public class HomeActivity extends BaseActivity {
         isExit();
     }
 
-    private void isExit(){
+    private void isExit() {
         if (isFinish) {
             finish();
         } else {
@@ -186,7 +207,7 @@ public class HomeActivity extends BaseActivity {
             if (!TextUtils.isEmpty(photoAlbum.getCoverUrl())) {
                 ImageLoader.getInstance().displayImage(photoAlbum.getCoverUrl(), albumCover);
             }
-            if(photoAlbum.getType() == 1){
+            if (photoAlbum.getType() == 1) {
                 albumName.setTextColor(Color.RED);
             }
             albumName.setText(photoAlbum.getName());

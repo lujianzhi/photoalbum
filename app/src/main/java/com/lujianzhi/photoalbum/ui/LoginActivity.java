@@ -4,16 +4,18 @@ import android.content.Intent;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
-import android.widget.Toast;
 
+import com.lidroid.xutils.exception.HttpException;
+import com.lidroid.xutils.http.ResponseInfo;
 import com.lujianzhi.photoalbum.R;
 import com.lujianzhi.photoalbum.entity.User;
+import com.lujianzhi.photoalbum.net.PhotoAlbumManager;
 import com.lujianzhi.photoalbum.net.UserManager;
+import com.lujianzhi.photoalbum.net.networktask.INetWorkListener;
 import com.lujianzhi.photoalbum.ui.base.BaseActivity;
-import com.lujianzhi.photoalbum.view.MyRegisterDialog;
+import com.lujianzhi.photoalbum.utils.LogUtils;
 import com.lujianzhi.photoalbum.utils.SharedPreferencesUtils;
-
-import cn.bmob.v3.listener.SaveListener;
+import com.lujianzhi.photoalbum.view.MyRegisterDialog;
 
 
 /**
@@ -21,12 +23,16 @@ import cn.bmob.v3.listener.SaveListener;
  */
 public class LoginActivity extends BaseActivity {
 
-    private EditText phoneNumber;
+    private String TAG = LoginActivity.class.getName();
+
+    private EditText userName;
     private EditText userPassword;
     private TextView login;
     private TextView register;
     private User user;
     public static boolean loginState;
+
+    public PhotoAlbumManager photoAlbumManager;
 
     @Override
     protected void initTopViews() {
@@ -35,7 +41,9 @@ public class LoginActivity extends BaseActivity {
 
     @Override
     protected void initViews() {
-        phoneNumber = (EditText) findViewById(R.id.phone_number);
+        photoAlbumManager = PhotoAlbumManager.getInstance();
+
+        userName = (EditText) findViewById(R.id.userName);
         userPassword = (EditText) findViewById(R.id.user_password);
         login = (TextView) findViewById(R.id.login);
         register = (TextView) findViewById(R.id.register);
@@ -60,30 +68,33 @@ public class LoginActivity extends BaseActivity {
     }
 
     public void login() {
-        user = (User) UserManager.getInstance().getUser(this);
-        user.setMobilePhoneNumber(phoneNumber.getText().toString());
-        user.setUsername(phoneNumber.getText().toString());
+        user = UserManager.getInstance().getUser();
         user.setPassword(userPassword.getText().toString());
-        user.login(this, new SaveListener() {
+        user.setUserName(userName.getText().toString());
+        photoAlbumManager.loginRequest(userName.getText().toString(), userPassword.getText().toString(), new INetWorkListener() {
             @Override
-            public void onSuccess() {
-                Intent intent = new Intent(LoginActivity.this, HomeActivity.class);
-                startActivity(intent);
-                LoginActivity.loginState = true;
-                SharedPreferencesUtils.recordLoginState(LoginActivity.this, LoginActivity.loginState);
-                finish();
+            public <T> void onSuccess(ResponseInfo<T> responseInfo) {
+                String respondStr = responseInfo.result.toString();
+                LogUtils.i(TAG, respondStr);
+
+                if (PhotoAlbumManager.getInstance().parserLogin(respondStr) == 1) {
+                    Intent intent = new Intent(LoginActivity.this, HomeActivity.class);
+                    startActivity(intent);
+                    LoginActivity.loginState = true;
+                    SharedPreferencesUtils.recordLoginState(LoginActivity.this, LoginActivity.loginState);
+                    finish();
+                }
             }
 
             @Override
-            public void onFailure(int i, String s) {
-                Toast.makeText(LoginActivity.this, R.string.login_failed, Toast.LENGTH_SHORT).show();
+            public void onFailure(HttpException error, String msg) {
                 LoginActivity.loginState = false;
                 SharedPreferencesUtils.recordLoginState(LoginActivity.this, LoginActivity.loginState);
             }
         });
     }
 
-    private void regist() {
+    private void register() {
         showDialog();
     }
 
@@ -99,7 +110,7 @@ public class LoginActivity extends BaseActivity {
                 login();
                 break;
             case R.id.register:
-                regist();
+                register();
                 break;
             default:
                 break;

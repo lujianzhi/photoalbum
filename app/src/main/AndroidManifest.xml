@@ -29,23 +29,33 @@
 
         <activity
             android:name=".ui.LoginActivity"
-            android:launchMode="singleTask"></activity>
+            android:launchMode="singleTask">
+
+        </activity>
 
         <activity
             android:name=".ui.PhotoAlbumActivity"
-            android:launchMode="singleTask"></activity>
+            android:launchMode="singleTask">
+
+        </activity>
 
         <activity
             android:name=".ui.PhotoActivity"
-            android:launchMode="singleTask"></activity>
+            android:launchMode="singleTask">
+
+        </activity>
 
         <activity
             android:name=".ui.HomeActivity"
-            android:launchMode="singleTask"></activity>
+            android:launchMode="singleTask">
+
+        </activity>
 
         <activity
             android:name=".ui.UserCenterActivity"
-            android:launchMode="singleTask"></activity>
+            android:launchMode="singleTask">
+
+        </activity>
     </application>
 
 </manifest>

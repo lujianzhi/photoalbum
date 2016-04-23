@@ -3,18 +3,22 @@
     <string name="app_name">喽相册</string>
     <string name="PhotoAlbumActivity_name">相册们</string>
 
+    <!-- 网络相关 -->
+    <string name="json_code_error">json_code格式不正确</string>
+    <string name="json_message_error">json_message格式不正确</string>
+
     <!--登陆相关-->
     <string name="account">账号</string>
     <string name="nickname">昵称</string>
     <string name="password">密码</string>
-    <string name="input_account">请输入手机号</string>
+    <string name="input_account">请输入账户</string>
     <string name="input_nickname">请输入昵称</string>
     <string name="input_password">请输入密码</string>
     <string name="login">登录</string>
-    <string name="login_failed">登录失败(检查手机号和密码是否正确)</string>
+    <string name="login_failed">登录失败(用户名不存在或密码不正确)</string>
     <string name="register">注册</string>
     <string name="register_success">注册成功</string>
-    <string name="register_failed">注册失败(手机号已被注册或是格式不正确)</string>
+    <string name="register_failed">注册失败(用户名已被注册)</string>
     <string name="cancel">取消</string>
 
     <!--提示-->

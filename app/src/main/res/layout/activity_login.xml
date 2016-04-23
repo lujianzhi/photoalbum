@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:background="@color/color12">
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@color/color12">
 
     <RelativeLayout
         android:layout_width="match_parent"
@@ -35,14 +35,14 @@
                 android:textSize="@dimen/font_15"/>
 
             <EditText
-                android:id="@+id/phone_number"
+                android:id="@+id/userName"
                 android:layout_width="match_parent"
                 android:layout_height="@dimen/gap_40"
                 android:layout_marginLeft="@dimen/gap_20"
                 android:layout_toRightOf="@id/name"
-                android:inputType="phone"
                 android:background="@null"
-                android:hint="@string/input_account"/>
+                android:hint="@string/input_account"
+                android:singleLine="true"/>
 
         </RelativeLayout>
 
@@ -72,8 +72,9 @@
                 android:layout_marginLeft="@dimen/gap_20"
                 android:layout_toRightOf="@id/password"
                 android:background="@null"
+                android:hint="@string/input_password"
                 android:inputType="textPassword"
-                android:hint="@string/input_password"/>
+                android:singleLine="true"/>
 
         </RelativeLayout>
 

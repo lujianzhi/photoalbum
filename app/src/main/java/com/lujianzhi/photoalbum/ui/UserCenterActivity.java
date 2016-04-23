@@ -9,8 +9,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.lujianzhi.photoalbum.R;
-import com.lujianzhi.photoalbum.entity.User;
-import com.lujianzhi.photoalbum.net.UserManager;
 import com.lujianzhi.photoalbum.ui.base.BaseActivity;
 import com.lujianzhi.photoalbum.utils.SharedPreferencesUtils;
 import com.lujianzhi.photoalbum.view.RoundImageView;
@@ -39,11 +37,11 @@ public class UserCenterActivity extends BaseActivity {
     @Override
     protected void initViews() {
         nickName = (TextView) findViewById(R.id.nick_name);
-        phoneNumber = (TextView) findViewById(R.id.phone_number);
+        phoneNumber = (TextView) findViewById(R.id.userName);
         userPortrait = (RoundImageView) findViewById(R.id.user_portrait);
 
-        user = UserManager.getInstance().getUser(this);
-        nickName.setText(((User) user).getNickName());
+//        user = UserManager.getInstance().getUser();
+//        nickName.setText(((User) user).getUserName());
         phoneNumber.setText(String.format(getResources().getString(R.string.phone_number), user.getMobilePhoneNumber().toString()));
 //        ImageLoader.getInstance().displayImage(((User) user).getUserPortrait(), userPortrait);
 

@@ -5,13 +5,11 @@ import android.content.Context;
 import android.text.TextUtils;
 import android.view.View;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.lujianzhi.photoalbum.R;
 import com.lujianzhi.photoalbum.entity.User;
 import com.lujianzhi.photoalbum.net.UserManager;
-
-import cn.bmob.v3.BmobUser;
+import com.lujianzhi.photoalbum.utils.ToastUtils;
 
 /**
  * Created by lujianzhi on 2016/1/29.
@@ -22,13 +20,11 @@ public class MyRegisterDialog extends Dialog {
     private View popView;
     private TextView negative;
     private TextView positive;
-    private TextView phoneNumber;
-    private TextView nickName;
+    private TextView userName;
     private TextView password;
-    private String phoneNumberStr;
-    private String nickNameStr;
+    private String userNameStr;
     private String passwordStr;
-    private BmobUser user;
+    private User user;
 
     public MyRegisterDialog(Context context, int themeResId) {
         super(context, themeResId);
@@ -42,20 +38,16 @@ public class MyRegisterDialog extends Dialog {
     private void initView() {
         positive = (TextView) popView.findViewById(R.id.regist);
         negative = (TextView) popView.findViewById(R.id.cancel);
-        phoneNumber = (TextView) popView.findViewById(R.id.account);
-        nickName = (TextView) popView.findViewById(R.id.nickname);
+        userName = (TextView) popView.findViewById(R.id.username);
         password = (TextView) popView.findViewById(R.id.password);
     }
 
     private void getRegisterData() {
-        phoneNumberStr = phoneNumber.getText().toString();
+        userNameStr = userName.getText().toString();
         passwordStr = password.getText().toString();
-        nickNameStr = nickName.getText().toString();
 
-        user = UserManager.getInstance().getUser(context);
-        user.setMobilePhoneNumber(phoneNumberStr);
-        user.setUsername(phoneNumberStr);
-        ((User) user).setNickName(nickNameStr);
+        user = UserManager.getInstance().getUser();
+        user.setUserName(userNameStr);
         user.setPassword(passwordStr);
     }
 
@@ -65,8 +57,8 @@ public class MyRegisterDialog extends Dialog {
             @Override
             public void onClick(View v) {
                 getRegisterData();
-                if (TextUtils.isEmpty(phoneNumberStr) || TextUtils.isEmpty(passwordStr)) {
-                    Toast.makeText(context, R.string.register_fail, Toast.LENGTH_SHORT).show();
+                if (TextUtils.isEmpty(userNameStr) || TextUtils.isEmpty(passwordStr)) {
+                    ToastUtils.showShortToast(R.string.register_fail);
                 } else {
                     UserManager.getInstance().registerUser(context, user, MyRegisterDialog.this);
                 }

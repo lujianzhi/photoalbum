@@ -121,7 +121,7 @@ public class PhotoActivity extends BaseActivity {
     private void showOrHideComment(float xDown, float xUp, float yDown, float yUp) {
         if (xDown - xUp < 250 && xDown - xUp > -250) {
             TextView comment = new TextView(this);
-            comment.setText(photoList.get(photoPosition).getComment());
+//            comment.setText(photoList.get(photoPosition).getComment());
             comment.setPadding((int) xDown, (int) yDown, 0, 0);
             comment.setTextColor(Color.BLACK);
             comment.setTextSize(20);

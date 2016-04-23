@@ -1,13 +1,10 @@
 package com.lujianzhi.photoalbum.net;
 
-import android.content.Context;
-
 import com.lujianzhi.photoalbum.entity.Photo;
 import com.lujianzhi.photoalbum.entity.PhotoAlbum;
 import com.lujianzhi.photoalbum.net.network.PhotoAlbumNetWork;
+import com.lujianzhi.photoalbum.net.networktask.INetWorkListener;
 import com.lujianzhi.photoalbum.net.parser.PhotoAlbumParser;
-import com.lujianzhi.photoalbum.ui.HomeActivity;
-import com.lujianzhi.photoalbum.ui.PhotoAlbumActivity;
 
 import java.util.ArrayList;
 
@@ -38,21 +35,28 @@ public class PhotoAlbumManager {
         return instance;
     }
 
-    public void addPhotoAlbum(Context context, int id, String tableName, int type) {
-        photoAlbumNetWork.addPhotoAlbum(context, id, tableName, type);
+    public int parserAddAlbum(String jsonStr){
+        return photoAlbumParser.parserAddAlbum(jsonStr);
     }
 
-    public void getPhotoAlbum(Context context,HomeActivity.PhotoAlbumAdapter adapter) {
-        photoAlbumParser.getPhotoAlbum(context,adapter);
+    public void addPhotoAlbumRequest(String name, int type, INetWorkListener netWorkListener) {
+        photoAlbumNetWork.addAlbumRequest(name, type, netWorkListener);
     }
 
-    public void getPhoto(Context context,PhotoAlbumActivity.MyAdapter adapter,int albumId) {
-        clearPhoto();
-        photoAlbumParser.getPhoto(context, adapter, albumId);
+    public int parseRegisterStatues(String jsonStr) {
+        return photoAlbumParser.parseRegisterStatues(jsonStr);
     }
 
-    private void clearPhoto() {
-        photos.clear();
+    public void registerRequest(String userName, String password, INetWorkListener netWorkListener) {
+        photoAlbumNetWork.registerRequest(userName, password, netWorkListener);
+    }
+
+    public int parserLogin(String jsonStr) {
+        return photoAlbumParser.parseLoginStatues(jsonStr);
+    }
+
+    public void loginRequest(String userName, String password, INetWorkListener netWorkListener) {
+        photoAlbumNetWork.login(userName, password, netWorkListener);
     }
 
 }

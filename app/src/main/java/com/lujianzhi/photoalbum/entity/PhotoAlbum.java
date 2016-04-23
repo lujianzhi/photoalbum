@@ -3,27 +3,12 @@ package com.lujianzhi.photoalbum.entity;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-import cn.bmob.v3.BmobObject;
-
-/**
- * Bmob存储的数据是建立在BmobObject基础上的，所以任何要保存的数据对象必须继承自BmobObject类。
- * BmobObject类本身包含objectId、createdAt、updatedAt、ACL四个默认的属性，
- * objectId是数据的唯一标示，相当于数据库中表的主键，createdAt是数据的创建时间，updatedAt是数据的最后修改时间，ACL是数据的操作权限。
- * <p/>
- * 尽可能使用Integer、Boolean，而不是int、boolean，也就是选择包装类，而不是使用基本数据类型
- * <p/>
- * JavaBean不需要对objectId、createdAt、updatedAt、ACL四个属性进行定义。
- * <p/>
- * Created by lujianzhi on 2016/1/21.
- */
-public class PhotoAlbum extends BmobObject implements Parcelable{
-
-    public static final String TABLENAME = "album";
+public class PhotoAlbum implements Parcelable {
 
     /**
      * 相册id
      */
-    private Integer id;
+    private int id;
 
     /**
      * 相册名
@@ -35,40 +20,21 @@ public class PhotoAlbum extends BmobObject implements Parcelable{
      * 0 --> 隐私
      * 1 --> 公开
      */
-    private Integer type;
+    private int type;
 
     /**
      * 相册封面url
      */
     private String coverUrl;
 
-    /**
-     * 相片数量
-     */
-    private Integer count;
-
-    /**
-     * 相册评论
-     */
-    private String comment;
-
     public PhotoAlbum() {
-        this.setTableName(PhotoAlbum.TABLENAME);
-    }
-
-    public PhotoAlbum(Integer id, String name, Integer type, String coverUrl, Integer count, String comment) {
-        this.id = id;
-        this.name = name;
-        this.type = type;
-        this.coverUrl = coverUrl;
-        this.count = count;
-        this.comment = comment;
     }
 
     protected PhotoAlbum(Parcel in) {
+        id = in.readInt();
         name = in.readString();
+        type = in.readInt();
         coverUrl = in.readString();
-        comment = in.readString();
     }
 
     public static final Creator<PhotoAlbum> CREATOR = new Creator<PhotoAlbum>() {
@@ -115,22 +81,6 @@ public class PhotoAlbum extends BmobObject implements Parcelable{
         this.coverUrl = coverUrl;
     }
 
-    public Integer getCount() {
-        return count;
-    }
-
-    public void setCount(Integer count) {
-        this.count = count;
-    }
-
-    public String getComment() {
-        return comment;
-    }
-
-    public void setComment(String comment) {
-        this.comment = comment;
-    }
-
     @Override
     public String toString() {
         return "PhotoAlbum{" +
@@ -138,7 +88,6 @@ public class PhotoAlbum extends BmobObject implements Parcelable{
                 ", name='" + name + '\'' +
                 ", type='" + type + '\'' +
                 ", coverUrl='" + coverUrl + '\'' +
-                ", count=" + count +
                 '}';
     }
 
@@ -149,8 +98,9 @@ public class PhotoAlbum extends BmobObject implements Parcelable{
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
+        dest.writeInt(id);
         dest.writeString(name);
+        dest.writeInt(type);
         dest.writeString(coverUrl);
-        dest.writeString(comment);
     }
 }

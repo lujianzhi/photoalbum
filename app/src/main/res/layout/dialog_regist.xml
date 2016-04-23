@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:layout_marginLeft="@dimen/gap_30"
-    android:layout_marginRight="@dimen/gap_30"
-    android:background="@drawable/dialog_round_corner"
-    android:gravity="center"
-    android:paddingTop="@dimen/gap_10">
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="@dimen/gap_30"
+                android:layout_marginRight="@dimen/gap_30"
+                android:background="@drawable/dialog_round_corner"
+                android:gravity="center"
+                android:paddingTop="@dimen/gap_10">
 
     <LinearLayout
         android:id="@+id/account_area"
@@ -21,21 +21,21 @@
             android:layout_height="@dimen/gap_30"
             android:gravity="center"
             android:text="@string/account"
-            android:textSize="@dimen/font_17" />
+            android:textSize="@dimen/font_17"/>
 
         <EditText
-            android:id="@+id/account"
+            android:id="@+id/username"
             android:layout_width="match_parent"
             android:layout_height="@dimen/gap_30"
             android:layout_marginLeft="@dimen/gap_20"
             android:background="@null"
             android:hint="@string/input_account"
-            android:textSize="@dimen/font_15" />
+            android:textSize="@dimen/font_15"/>
 
     </LinearLayout>
 
     <LinearLayout
-        android:id="@+id/nickname_area"
+        android:id="@+id/password_area"
         android:layout_width="match_parent"
         android:layout_height="@dimen/gap_30"
         android:layout_below="@id/account_area"
@@ -48,36 +48,8 @@
             android:layout_width="wrap_content"
             android:layout_height="@dimen/gap_30"
             android:gravity="center"
-            android:text="@string/nick_name"
-            android:textSize="@dimen/font_17" />
-
-        <EditText
-            android:id="@+id/nickname"
-            android:layout_width="match_parent"
-            android:layout_height="@dimen/gap_30"
-            android:layout_marginLeft="@dimen/gap_20"
-            android:background="@null"
-            android:hint="@string/input_nickname"
-            android:textSize="@dimen/font_15" />
-
-    </LinearLayout>
-
-    <LinearLayout
-        android:id="@+id/password_area"
-        android:layout_width="match_parent"
-        android:layout_height="@dimen/gap_30"
-        android:layout_below="@id/nickname_area"
-        android:layout_marginLeft="@dimen/gap_10"
-        android:layout_marginRight="@dimen/gap_10"
-        android:layout_marginTop="@dimen/gap_10"
-        android:gravity="center_vertical">
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="@dimen/gap_30"
-            android:gravity="center"
             android:text="@string/password"
-            android:textSize="@dimen/font_17" />
+            android:textSize="@dimen/font_17"/>
 
         <EditText
             android:id="@+id/password"
@@ -86,7 +58,7 @@
             android:layout_marginLeft="@dimen/gap_20"
             android:background="@null"
             android:hint="@string/input_password"
-            android:textSize="@dimen/font_15" />
+            android:textSize="@dimen/font_15"/>
 
     </LinearLayout>
 
@@ -96,7 +68,7 @@
         android:layout_height="@dimen/px_1"
         android:layout_below="@id/password_area"
         android:layout_marginTop="@dimen/gap_10"
-        android:background="@color/color10" />
+        android:background="@color/color10"/>
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -112,12 +84,12 @@
             android:gravity="center"
             android:text="@string/register"
             android:textColor="@color/color22"
-            android:textSize="@dimen/font_17" />
+            android:textSize="@dimen/font_17"/>
 
         <View
             android:layout_width="@dimen/px_1"
             android:layout_height="match_parent"
-            android:background="@color/color10" />
+            android:background="@color/color10"/>
 
         <TextView
             android:id="@+id/cancel"
@@ -128,7 +100,7 @@
             android:gravity="center"
             android:text="@string/cancel"
             android:textColor="@color/color22"
-            android:textSize="@dimen/font_17" />
+            android:textSize="@dimen/font_17"/>
     </LinearLayout>
 
 </RelativeLayout>

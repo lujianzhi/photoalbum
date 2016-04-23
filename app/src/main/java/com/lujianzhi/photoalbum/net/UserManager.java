@@ -1,21 +1,22 @@
 package com.lujianzhi.photoalbum.net;
 
 import android.content.Context;
-import android.widget.Toast;
 
-import com.lujianzhi.photoalbum.R;
+import com.lidroid.xutils.exception.HttpException;
+import com.lidroid.xutils.http.ResponseInfo;
 import com.lujianzhi.photoalbum.entity.User;
+import com.lujianzhi.photoalbum.net.networktask.INetWorkListener;
+import com.lujianzhi.photoalbum.utils.LogUtils;
 import com.lujianzhi.photoalbum.view.MyRegisterDialog;
-
-import cn.bmob.v3.BmobUser;
-import cn.bmob.v3.listener.SaveListener;
 
 /**
  * Created by lujianzhi on 2016/1/29.
  */
 public class UserManager {
 
-    private BmobUser user;
+    private String TAG = UserManager.class.getName();
+
+    private User user;
     private static UserManager userManager;
 
     private UserManager() {
@@ -33,12 +34,7 @@ public class UserManager {
         return userManager;
     }
 
-    public BmobUser getUser(Context context) {
-        /**
-         * 在扩展了用户类的情况下获取当前登录用户，可以使用如下的示例代码
-         * MyUser userInfo = BmobUser.getCurrentUser(context,MyUser.class);
-         */
-        User user = BmobUser.getCurrentUser(context, User.class);
+    public User getUser() {
         if (user != null) {
             return user;
         } else {
@@ -52,17 +48,20 @@ public class UserManager {
      * @param context
      * @param user
      */
-    public void registerUser(final Context context, BmobUser user, final MyRegisterDialog dialog) {
-        user.signUp(context, new SaveListener() {
+    public void registerUser(final Context context, User user, final MyRegisterDialog dialog) {
+        PhotoAlbumManager.getInstance().registerRequest(user.getUserName(), user.getPassword(), new INetWorkListener() {
             @Override
-            public void onSuccess() {
-                Toast.makeText(context, R.string.register_success, Toast.LENGTH_SHORT).show();
-                dialog.dismiss();
+            public <T> void onSuccess(ResponseInfo<T> responseInfo) {
+                String responseStr = responseInfo.result.toString();
+                LogUtils.i(TAG, responseStr);
+
+                if (PhotoAlbumManager.getInstance().parseRegisterStatues(responseStr) == 1) {
+                    dialog.dismiss();
+                }
             }
 
             @Override
-            public void onFailure(int i, String s) {
-                Toast.makeText(context, R.string.register_failed, Toast.LENGTH_SHORT).show();
+            public void onFailure(HttpException error, String msg) {
             }
         });
     }
