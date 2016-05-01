@@ -2,29 +2,36 @@ package com.lujianzhi.photoalbum.ui;
 
 import android.app.Activity;
 import android.content.Intent;
-import android.graphics.Color;
-import android.graphics.drawable.ColorDrawable;
+import android.database.Cursor;
+import android.net.Uri;
 import android.os.Bundle;
+import android.provider.MediaStore;
+import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.BaseAdapter;
-import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
+import com.lidroid.xutils.exception.HttpException;
+import com.lidroid.xutils.http.ResponseInfo;
 import com.lujianzhi.photoalbum.R;
+import com.lujianzhi.photoalbum.config.NetWorkConfig;
 import com.lujianzhi.photoalbum.entity.Photo;
 import com.lujianzhi.photoalbum.entity.PhotoAlbum;
+import com.lujianzhi.photoalbum.net.PhotoAlbumManager;
+import com.lujianzhi.photoalbum.net.networktask.INetWorkListener;
 import com.lujianzhi.photoalbum.ui.base.BaseActivity;
-import com.lujianzhi.photoalbum.utils.ViewHolder;
-import com.lujianzhi.photoalbum.view.SateliteMenu;
-import com.nostra13.universalimageloader.core.ImageLoader;
+import com.lujianzhi.photoalbum.utils.LogUtils;
+import com.lujianzhi.photoalbum.utils.ToastUtils;
+import com.lujianzhi.photoalbum.view.MyConfirmDialog;
+import com.lujianzhi.photoalbum.view.MyLongPressDialog;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -32,13 +39,14 @@ import java.util.List;
  * Created by lujianzhi on 2016/1/21.
  */
 public class PhotoAlbumActivity extends BaseActivity {
+    private static final String TAG = PhotoAlbumActivity.class.getName();
 
-    private SateliteMenu mSateliteMenu;
-    private GridView photosView;
+    private RecyclerView photosView;
     private List<Photo> photoList = new ArrayList<Photo>();
     private PhotoAlbum photoAlbum;
     private String albumName;
     private int albumId;
+    private PhotoRVAdapter adapter;
 
     public static final int SYSTEM_GARRLY_REQUEST_CODE = 100;
 
@@ -56,19 +64,22 @@ public class PhotoAlbumActivity extends BaseActivity {
 
     @Override
     protected void initViews() {
-        photosView = (GridView) findViewById(R.id.photos);
-        MyAdapter adapter = new MyAdapter();
-//        PhotoAlbumManager.getInstance().getPhoto(this, adapter, albumId);
+        photosView = (RecyclerView) findViewById(R.id.photos);
+        adapter = new PhotoRVAdapter();
         photosView.setAdapter(adapter);
-        photosView.setSelector(new ColorDrawable(Color.TRANSPARENT));
-        photosView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+        PhotoAlbumManager.getInstance().getAllPhoto(String.valueOf(albumId), new INetWorkListener() {
             @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Intent intent = new Intent(PhotoAlbumActivity.this, PhotoActivity.class);
-                Bundle data = new Bundle();
-                data.putInt("position", position);
-                intent.putExtra("data", data);
-                startActivity(intent);
+            public <T> void onSuccess(ResponseInfo<T> responseInfo) {
+                String resultStr = responseInfo.result.toString();
+                LogUtils.i(TAG, " photo/findAll.do : " + resultStr);
+                PhotoAlbumManager.getInstance().clearPhoto();
+                adapter.setData(PhotoAlbumManager.getInstance().parserAllPhoto(resultStr));
+                adapter.notifyDataSetChanged();
+            }
+
+            @Override
+            public void onFailure(HttpException error, String msg) {
+
             }
         });
 
@@ -114,11 +125,52 @@ public class PhotoAlbumActivity extends BaseActivity {
     }
 
     @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+    protected void onActivityResult(int requestCode, int resultCode, final Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
         if (requestCode == PhotoAlbumActivity.SYSTEM_GARRLY_REQUEST_CODE && resultCode == Activity.RESULT_OK && data != null) {
-            // TODO 选中图片以后上传图片
+            MyConfirmDialog dialog = new MyConfirmDialog(PhotoAlbumActivity.this);
+            dialog.setPositiveClickListener(new MyConfirmDialog.IMyClickListener() {
+                @Override
+                public void onClick() {
+
+                    Uri selectedImage = data.getData();
+                    String[] filePathColumn = {MediaStore.Images.Media.DATA};
+                    Cursor cursor = getContentResolver().query(selectedImage,
+                            filePathColumn, null, null, null);
+                    if (cursor != null) {
+                        cursor.moveToFirst();
+                        int columnIndex = cursor.getColumnIndex(filePathColumn[0]);
+                        String picturePath = cursor.getString(columnIndex);
+                        String[] pics = picturePath.split("/");
+                        File file = new File(picturePath);
+
+                        PhotoAlbumManager.getInstance().addPhotoRequest(String.valueOf(albumId), file, pics[pics.length - 1], new INetWorkListener() {
+                            @Override
+                            public <T> void onSuccess(ResponseInfo<T> responseInfo) {
+                                String resultStr = responseInfo.result.toString();
+                                LogUtils.i(TAG, " photo/upload.do : " + resultStr);
+
+                                if (PhotoAlbumManager.getInstance().parserAddPhoto(resultStr) == 1) {
+                                    ToastUtils.showShortToast("保存相片成功");
+                                    PhotoAlbumManager.getInstance().parserAllPhoto(resultStr).get(0);
+                                    adapter.notifyDataSetChanged();
+                                } else {
+                                    ToastUtils.showShortToast("保存相片失败");
+                                }
+                            }
+
+                            @Override
+                            public void onFailure(HttpException error, String msg) {
+                                LogUtils.i(TAG, " photo/upload.do error-msg : " + msg);
+                            }
+                        });
+                        cursor.close();
+                    }
+
+                }
+            });
+            dialog.show();
         }
     }
 
@@ -145,36 +197,89 @@ public class PhotoAlbumActivity extends BaseActivity {
         }
     }
 
-    public class MyAdapter extends BaseAdapter {
 
+    public class PhotoRVAdapter extends RecyclerView.Adapter<PhotoRVAdapter.MyViewHolder> {
         public void setData(List<Photo> photos) {
             photoList = photos;
         }
 
+        public void clearData() {
+            photoList.clear();
+        }
+
         @Override
-        public int getCount() {
+        public MyViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+            View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.photo_album_item, null);
+            return new MyViewHolder(view);
+        }
+
+        @Override
+        public void onBindViewHolder(MyViewHolder holder, final int position) {
+            final Photo photo = photoList.get(position);
+            if (!"null".equals(photo.getPhotoUrl())) {
+                Glide.with(PhotoAlbumActivity.this).load(NetWorkConfig.getHttpApiPath() + photo.getPhotoUrl()).into(holder.photoImage);
+            } else {
+                holder.photoImage.setImageResource(R.drawable.photo);
+            }
+
+            holder.itemView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Intent intent = new Intent(PhotoAlbumActivity.this, PhotoActivity.class);
+                    Bundle data = new Bundle();
+                    data.putParcelableArrayList("photoList", (ArrayList<Photo>) photoList);
+                    data.putInt("position", position);
+                    intent.putExtra("data", data);
+                    startActivity(intent);
+                }
+            });
+
+            holder.itemView.setOnLongClickListener(new View.OnLongClickListener() {
+                @Override
+                public boolean onLongClick(View v) {
+                    MyLongPressDialog dialog = new MyLongPressDialog(PhotoAlbumActivity.this);
+                    dialog.setPositiveClickListener(new MyLongPressDialog.IMyClickListener() {
+                        @Override
+                        public void onClick() {
+                            PhotoAlbumManager.getInstance().deleteAlbumRequest(String.valueOf(photo.getId()), new INetWorkListener() {
+                                @Override
+                                public <T> void onSuccess(ResponseInfo<T> responseInfo) {
+                                    String jsonStr = responseInfo.result.toString();
+                                    if (1 == PhotoAlbumManager.getInstance().parserDeleteAlbum(jsonStr)) {
+                                        //TODO 删除后返回所有的相册信息
+//                                        adapter.setData();
+//                                        adapter.notifyDataSetChanged();
+                                    }
+                                }
+
+                                @Override
+                                public void onFailure(HttpException error, String msg) {
+
+                                }
+                            });
+                        }
+                    });
+                    dialog.show();
+                    return false;
+                }
+            });
+
+
+        }
+
+        @Override
+        public int getItemCount() {
             return photoList.size();
         }
 
-        @Override
-        public Photo getItem(int position) {
-            return photoList.get(position);
-        }
+        public class MyViewHolder extends RecyclerView.ViewHolder {
 
-        @Override
-        public long getItemId(int position) {
-            return position;
-        }
+            ImageView photoImage;
 
-        @Override
-        public View getView(int position, View convertView, ViewGroup parent) {
-            if (convertView == null) {
-                convertView = LayoutInflater.from(PhotoAlbumActivity.this).inflate(R.layout.photo_shrunken_item, null);
+            public MyViewHolder(View itemView) {
+                super(itemView);
+                photoImage = (ImageView) itemView.findViewById(R.id.cover);
             }
-            Photo photo = photoList.get(position);
-            ImageView photoView = ViewHolder.get(convertView, R.id.photo);
-            ImageLoader.getInstance().displayImage(photo.getPhotoUrl(), photoView);
-            return convertView;
         }
     }
 

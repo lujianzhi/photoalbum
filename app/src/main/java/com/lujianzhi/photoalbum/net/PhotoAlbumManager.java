@@ -6,7 +6,9 @@ import com.lujianzhi.photoalbum.net.network.PhotoAlbumNetWork;
 import com.lujianzhi.photoalbum.net.networktask.INetWorkListener;
 import com.lujianzhi.photoalbum.net.parser.PhotoAlbumParser;
 
+import java.io.File;
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by lujianzhi on 2016/1/21.
@@ -35,7 +37,43 @@ public class PhotoAlbumManager {
         return instance;
     }
 
-    public int parserAddAlbum(String jsonStr){
+    public void clearPhoto() {
+        photoAlbumParser.clearPhoto();
+    }
+
+    public List<Photo> parserAllPhoto(String jsonStr) {
+        return photoAlbumParser.parserAllPhoto(jsonStr);
+    }
+
+    public void getAllPhoto(String belongId, INetWorkListener netWorkListener) {
+        photoAlbumNetWork.getAllPhoto(belongId, netWorkListener);
+    }
+
+    public int parserAddPhoto(String jsonStr) {
+        return photoAlbumParser.parserAddPhoto(jsonStr);
+    }
+
+    public void addPhotoRequest(String belongId, File file, String photoName, INetWorkListener netWorkListener) {
+        photoAlbumNetWork.addPhotoRequest(belongId, file, photoName, netWorkListener);
+    }
+
+    public int parserDeleteAlbum(String jsonStr) {
+        return photoAlbumParser.parserDeleteAlbum(jsonStr);
+    }
+
+    public void deleteAlbumRequest(String id, INetWorkListener netWorkListener) {
+        photoAlbumNetWork.deleteAlbumRequest(id, netWorkListener);
+    }
+
+    public List<PhotoAlbum> parserAllAlbum(String jsonStr) {
+        return photoAlbumParser.parserAllAlbum(jsonStr);
+    }
+
+    public void getAlbumsRequest(INetWorkListener netWorkListener) {
+        photoAlbumNetWork.getAlbumsRequest(netWorkListener);
+    }
+
+    public int parserAddAlbum(String jsonStr) {
         return photoAlbumParser.parserAddAlbum(jsonStr);
     }
 

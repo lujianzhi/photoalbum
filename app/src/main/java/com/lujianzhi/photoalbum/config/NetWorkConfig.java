@@ -12,12 +12,12 @@ public class NetWorkConfig {
     /**
      * 电脑ip
      */
-    public static final String ip = "192.168.1.109/";
+    public static final String ip = "192.168.1.102:8080/";
 
     /**
      * 中间路径
      */
-    public static final String path = "NetPhoto/";
+    public static final String path = "NetPhoto";
 
     public static String getHttpApiPath() {
         return policyName + ip + path;

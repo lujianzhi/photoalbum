@@ -1,8 +1,11 @@
 package com.lujianzhi.photoalbum.entity;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 import java.util.List;
 
-public class Photo{
+public class Photo implements Parcelable {
 
     /**
      * 照片id
@@ -40,6 +43,25 @@ public class Photo{
         this.comment = comment;
         this.belongId = belongId;
     }
+
+    protected Photo(Parcel in) {
+        id = in.readInt();
+        name = in.readString();
+        photoUrl = in.readString();
+        belongId = in.readInt();
+    }
+
+    public static final Creator<Photo> CREATOR = new Creator<Photo>() {
+        @Override
+        public Photo createFromParcel(Parcel in) {
+            return new Photo(in);
+        }
+
+        @Override
+        public Photo[] newArray(int size) {
+            return new Photo[size];
+        }
+    };
 
     public int getId() {
         return id;
@@ -79,5 +101,18 @@ public class Photo{
 
     public void setBelongId(int belongId) {
         this.belongId = belongId;
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeInt(id);
+        dest.writeString(name);
+        dest.writeString(photoUrl);
+        dest.writeInt(belongId);
     }
 }

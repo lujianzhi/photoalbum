@@ -1,21 +1,33 @@
 package com.lujianzhi.photoalbum.ui;
 
 import android.content.Intent;
+import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import com.lidroid.xutils.HttpUtils;
 import com.lidroid.xutils.exception.HttpException;
+import com.lidroid.xutils.http.RequestParams;
 import com.lidroid.xutils.http.ResponseInfo;
+import com.lidroid.xutils.http.callback.RequestCallBack;
+import com.lidroid.xutils.http.client.HttpRequest;
 import com.lujianzhi.photoalbum.R;
+import com.lujianzhi.photoalbum.config.NetWorkConfig;
 import com.lujianzhi.photoalbum.entity.User;
 import com.lujianzhi.photoalbum.net.PhotoAlbumManager;
 import com.lujianzhi.photoalbum.net.UserManager;
-import com.lujianzhi.photoalbum.net.networktask.INetWorkListener;
+import com.lujianzhi.photoalbum.net.networktask.MyCookieStore;
 import com.lujianzhi.photoalbum.ui.base.BaseActivity;
 import com.lujianzhi.photoalbum.utils.LogUtils;
 import com.lujianzhi.photoalbum.utils.SharedPreferencesUtils;
 import com.lujianzhi.photoalbum.view.MyRegisterDialog;
+
+import org.apache.http.client.CookieStore;
+import org.apache.http.cookie.Cookie;
+import org.apache.http.impl.client.DefaultHttpClient;
+
+import java.util.List;
 
 
 /**
@@ -71,23 +83,43 @@ public class LoginActivity extends BaseActivity {
         user = UserManager.getInstance().getUser();
         user.setPassword(userPassword.getText().toString());
         user.setUserName(userName.getText().toString());
-        photoAlbumManager.loginRequest(userName.getText().toString(), userPassword.getText().toString(), new INetWorkListener() {
+
+        final HttpUtils httpUtils = new HttpUtils(5000);
+        RequestParams params = new RequestParams();
+        params.addBodyParameter("userName", user.getUserName());
+        params.addBodyParameter("password", user.getPassword());
+        httpUtils.send(HttpRequest.HttpMethod.POST, NetWorkConfig.getHttpApiPath() + "/login/login.do", params, new RequestCallBack<Object>() {
             @Override
-            public <T> void onSuccess(ResponseInfo<T> responseInfo) {
+            public void onSuccess(ResponseInfo<Object> responseInfo) {
                 String respondStr = responseInfo.result.toString();
                 LogUtils.i(TAG, respondStr);
+
+                DefaultHttpClient dh = (DefaultHttpClient) httpUtils.getHttpClient();
+                MyCookieStore.cookieStore = dh.getCookieStore();
+                CookieStore cs = dh.getCookieStore();
+                List<Cookie> cookies = cs.getCookies();
+                String aa = null;
+                for (int i = 0; i < cookies.size(); i++) {
+                    if ("JSESSIONID".equals(cookies.get(i).getName())) {
+                        aa = cookies.get(i).getValue();
+                        break;
+                    }
+                }
+                Log.i("lawson", "比较sessionid" + aa);
+
 
                 if (PhotoAlbumManager.getInstance().parserLogin(respondStr) == 1) {
                     Intent intent = new Intent(LoginActivity.this, HomeActivity.class);
                     startActivity(intent);
-                    LoginActivity.loginState = true;
+                    //TODO 每次都为false
+                    LoginActivity.loginState = false;
                     SharedPreferencesUtils.recordLoginState(LoginActivity.this, LoginActivity.loginState);
                     finish();
                 }
             }
 
             @Override
-            public void onFailure(HttpException error, String msg) {
+            public void onFailure(HttpException e, String s) {
                 LoginActivity.loginState = false;
                 SharedPreferencesUtils.recordLoginState(LoginActivity.this, LoginActivity.loginState);
             }

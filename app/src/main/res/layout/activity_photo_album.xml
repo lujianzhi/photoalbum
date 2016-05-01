@@ -2,9 +2,9 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
+                android:background="@color/color12"
                 android:paddingLeft="@dimen/gap_5"
-                android:paddingRight="@dimen/gap_5"
-                android:background="@color/color12">
+                android:paddingRight="@dimen/gap_5">
 
     <include
         android:id="@+id/top"
@@ -17,16 +17,12 @@
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"/>
 
-    <GridView
+    <android.support.v7.widget.RecyclerView
         android:id="@+id/photos"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_above="@id/bottom"
-        android:layout_below="@id/top"
-        android:horizontalSpacing="@dimen/gap_5"
-        android:numColumns="4"
-        android:stretchMode="columnWidth"
-        android:verticalSpacing="@dimen/gap_5"/>
+        android:layout_below="@id/top"/>
 
 
 </RelativeLayout>

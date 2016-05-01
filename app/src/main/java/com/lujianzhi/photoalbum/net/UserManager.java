@@ -62,6 +62,7 @@ public class UserManager {
 
             @Override
             public void onFailure(HttpException error, String msg) {
+                LogUtils.i(TAG, " /login/register.do : " + error.getMessage());
             }
         });
     }

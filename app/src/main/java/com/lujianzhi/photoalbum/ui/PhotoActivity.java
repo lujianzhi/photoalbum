@@ -1,20 +1,23 @@
 package com.lujianzhi.photoalbum.ui;
 
-import android.graphics.Color;
 import android.os.Bundle;
-import android.view.MotionEvent;
+import android.os.Parcelable;
+import android.support.v4.view.PagerAdapter;
+import android.view.LayoutInflater;
 import android.view.View;
-import android.view.animation.AnimationUtils;
-import android.widget.FrameLayout;
+import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
 import com.lujianzhi.photoalbum.R;
 import com.lujianzhi.photoalbum.entity.Photo;
 import com.lujianzhi.photoalbum.ui.base.BaseActivity;
+import com.lujianzhi.photoalbum.ui.viewpager.HackyViewPager;
+import com.lujianzhi.photoalbum.view.photoview.PhotoView;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -24,17 +27,10 @@ import java.util.List;
  */
 public class PhotoActivity extends BaseActivity {
 
-    private ImageView photoImageView;
-    private FrameLayout comments;
-    private LinearLayout photoArea;
     private List<Photo> photoList = new ArrayList<Photo>();
     private int photoPosition;
     private TextView top_title;
-    private boolean isShow;
-    private float xDown = 0f;
-    private float yDown = 0f;
-    private float xUp = 0f;
-    private float yUp = 0f;
+    private HackyViewPager hackyViewPager;
 
     @Override
     public void onClick(View v) {
@@ -47,12 +43,6 @@ public class PhotoActivity extends BaseActivity {
                 break;
             case R.id.comment:
                 Toast.makeText(this, "添加对相册的评论", Toast.LENGTH_SHORT).show();
-                break;
-            case R.id.edit:
-                Toast.makeText(this, "对相册进行编辑", Toast.LENGTH_SHORT).show();
-                break;
-            case R.id.more:
-                Toast.makeText(this, "弹出更多菜单", Toast.LENGTH_SHORT).show();
                 break;
             default:
                 break;
@@ -73,26 +63,11 @@ public class PhotoActivity extends BaseActivity {
 
     @Override
     protected void initViews() {
-        photoImageView = (ImageView) findViewById(R.id.photo);
-        photoArea = (LinearLayout) findViewById(R.id.photo_area);
-        comments = (FrameLayout) findViewById(R.id.comments);
-//        photoImageView.setImageResource(photoList.get(photoPosition).getResId());
-        photoArea.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                int action = event.getAction();
-                if (action == MotionEvent.ACTION_DOWN) {
-                    xDown = event.getX();
-                    yDown = event.getY();
-                }
-                if (action == MotionEvent.ACTION_UP) {
-                    xUp = event.getX();
-                    yUp = event.getY();
-                    calculateXY(xDown, xUp, yDown, yUp);
-                }
-                return true;
-            }
-        });
+        hackyViewPager = (HackyViewPager) findViewById(R.id.photo_area);
+        ImagePagerAdapter adapter = new ImagePagerAdapter();
+        hackyViewPager.setAdapter(adapter);
+        hackyViewPager.setCurrentItem(photoPosition);
+//        photoImageView.setImageResource(photoList.get(photoPosition).getPhotoUrl());
     }
 
     @Override
@@ -103,59 +78,12 @@ public class PhotoActivity extends BaseActivity {
         add.setVisibility(View.GONE);
         ImageView comment = (ImageView) bottom.findViewById(R.id.comment);
         ImageView edit = (ImageView) bottom.findViewById(R.id.edit);
-        edit.setVisibility(View.VISIBLE);
+        edit.setVisibility(View.GONE);
         ImageView more = (ImageView) bottom.findViewById(R.id.more);
         back.setOnClickListener(getOnClickListener());
         comment.setOnClickListener(getOnClickListener());
-        edit.setOnClickListener(getOnClickListener());
         more.setOnClickListener(getOnClickListener());
     }
-
-    private void calculateXY(float xDown, float xUp, float yDown, float yUp) {
-        switchPhotos(xDown, xUp);
-
-        showOrHideComment(xDown, xUp, yDown, yUp);
-
-    }
-
-    private void showOrHideComment(float xDown, float xUp, float yDown, float yUp) {
-        if (xDown - xUp < 250 && xDown - xUp > -250) {
-            TextView comment = new TextView(this);
-//            comment.setText(photoList.get(photoPosition).getComment());
-            comment.setPadding((int) xDown, (int) yDown, 0, 0);
-            comment.setTextColor(Color.BLACK);
-            comment.setTextSize(20);
-            if (isShow) {
-                isShow = false;
-                comments.removeAllViews();
-                comments.setVisibility(View.GONE);
-            } else {
-                isShow = true;
-                comments.addView(comment);
-                comments.setVisibility(View.VISIBLE);
-            }
-        }
-    }
-
-    private void switchPhotos(float xDown, float xUp) {
-        Photo photo = new Photo();
-        if (xDown - xUp > 250 && photoPosition < photoList.size() - 1) {
-            photoPosition++;
-            changePhoto(photo, photoPosition);
-        } else if (xDown - xUp < -250 && photoPosition > 0) {
-            photoPosition--;
-            changePhoto(photo, photoPosition);
-        }
-    }
-
-    private void changePhoto(Photo photo, int position) {
-        photo = photoList.get(position);
-//        photoImageView.setImageResource(photo.getResId());
-        top_title.setText(photo.getName());
-        photoImageView.startAnimation(AnimationUtils.loadAnimation(this, R.anim.photo_change));
-        comments.removeAllViews();
-    }
-
 
     @Override
     protected int getLayoutId() {
@@ -171,9 +99,49 @@ public class PhotoActivity extends BaseActivity {
     protected void initIntentData() {
         Bundle data = getIntent().getBundleExtra("data");
         photoPosition = data.getInt("position");
+        photoList = data.getParcelableArrayList("photoList");
     }
 
     @Override
     protected void initData() {
+    }
+
+    private class ImagePagerAdapter extends PagerAdapter {
+
+        private LayoutInflater inflater;
+
+        ImagePagerAdapter() {
+            inflater = getLayoutInflater();
+        }
+
+        @Override
+        public void destroyItem(ViewGroup container, int position, Object object) {
+            (container).removeView((View) object);
+        }
+
+        @Override
+        public int getCount() {
+            return photoList.size();
+        }
+
+        @Override
+        public Object instantiateItem(ViewGroup view, int position) {
+            View imageLayout = inflater.inflate(R.layout.item_pager_image, view, false);
+
+            PhotoView imageView = (PhotoView) imageLayout.findViewById(R.id.photo);
+            Glide.with(PhotoActivity.this).load(photoList.get(position).getPhotoUrl()).into(imageView);
+            (view).addView(imageLayout, 0);
+            return imageLayout;
+        }
+
+        @Override
+        public boolean isViewFromObject(View view, Object object) {
+            return view.equals(object);
+        }
+
+        @Override
+        public Parcelable saveState() {
+            return null;
+        }
     }
 }

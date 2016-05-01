@@ -6,14 +6,14 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
 import com.lujianzhi.photoalbum.R;
+import com.lujianzhi.photoalbum.entity.User;
+import com.lujianzhi.photoalbum.net.UserManager;
 import com.lujianzhi.photoalbum.ui.base.BaseActivity;
 import com.lujianzhi.photoalbum.utils.SharedPreferencesUtils;
 import com.lujianzhi.photoalbum.view.RoundImageView;
-
-import cn.bmob.v3.BmobUser;
 
 /**
  * Created by lujianzhi on 2016/1/29.
@@ -23,7 +23,7 @@ public class UserCenterActivity extends BaseActivity {
     private TextView nickName;
     private TextView phoneNumber;
     private RoundImageView userPortrait;
-    private BmobUser user;
+    private User user;
 
     @Override
     protected void initTopViews() {
@@ -40,10 +40,14 @@ public class UserCenterActivity extends BaseActivity {
         phoneNumber = (TextView) findViewById(R.id.userName);
         userPortrait = (RoundImageView) findViewById(R.id.user_portrait);
 
-//        user = UserManager.getInstance().getUser();
-//        nickName.setText(((User) user).getUserName());
-        phoneNumber.setText(String.format(getResources().getString(R.string.phone_number), user.getMobilePhoneNumber().toString()));
-//        ImageLoader.getInstance().displayImage(((User) user).getUserPortrait(), userPortrait);
+        user = UserManager.getInstance().getUser();
+        nickName.setText(user.getUserName());
+
+        if ("null".equals(user.getUserUrl()) || "".equals(user.getUserUrl()) || user.getUserUrl() == null) {
+            userPortrait.setImageResource(R.drawable.photo);
+        } else {
+            Glide.with(UserCenterActivity.this).load(user.getUserUrl()).into(userPortrait);
+        }
 
         LinearLayout edit_area = (LinearLayout) findViewById(R.id.edit_area);
         LinearLayout logout_area = (LinearLayout) findViewById(R.id.logout_area);
@@ -74,11 +78,11 @@ public class UserCenterActivity extends BaseActivity {
                 finish();
                 break;
             case R.id.edit_area:
-                Toast.makeText(this, "编辑信息", Toast.LENGTH_SHORT).show();
+
                 break;
             case R.id.logout_area:
-                BmobUser.logOut(this);
-                SharedPreferencesUtils.recordLoginState(this,false);
+                //TODO 退出登录时需要将session清除
+                SharedPreferencesUtils.recordLoginState(this, false);
                 startActivity(new Intent(this, LoginActivity.class));
                 break;
         }

@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="@color/color12"
-    android:orientation="vertical">
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@color/color12"
+                android:orientation="vertical">
 
     <include
         android:id="@+id/top"
-        layout="@layout/top_layout" />
+        layout="@layout/top_layout"/>
 
-    <RelativeLayout
+    <LinearLayout
         android:id="@+id/user_info_area"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -17,14 +17,14 @@
         android:layout_marginTop="@dimen/gap_10"
         android:background="@color/color11"
         android:gravity="center_vertical"
-        android:orientation="vertical"
+        android:orientation="horizontal"
         android:padding="@dimen/gap_10">
 
         <com.lujianzhi.photoalbum.view.RoundImageView
             android:id="@+id/user_portrait"
             android:layout_width="@dimen/gap_70"
             android:layout_height="@dimen/gap_70"
-            android:src="@drawable/photo" />
+            android:src="@drawable/photo"/>
 
 
         <TextView
@@ -32,24 +32,11 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginLeft="@dimen/gap_10"
-            android:layout_marginTop="@dimen/gap_10"
-            android:layout_toRightOf="@id/user_portrait"
+            android:layout_marginStart="@dimen/gap_10"
             android:text="@string/nick_name"
-            android:textSize="@dimen/font_20" />
+            android:textSize="@dimen/font_20"/>
 
-        <TextView
-            android:id="@+id/userName"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/nick_name"
-            android:layout_marginLeft="@dimen/gap_10"
-            android:layout_marginTop="@dimen/gap_5"
-            android:layout_toRightOf="@id/user_portrait"
-            android:text="@string/phone_number"
-            android:textColor="@color/color16"
-            android:textSize="@dimen/font_14" />
-
-    </RelativeLayout>
+    </LinearLayout>
 
     <LinearLayout
         android:id="@+id/edit_area"
@@ -65,14 +52,15 @@
         <ImageView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:src="@drawable/edit" />
+            android:src="@drawable/edit"/>
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginLeft="@dimen/gap_15"
+            android:layout_marginStart="@dimen/gap_15"
             android:text="@string/edit"
-            android:textSize="@dimen/font_20" />
+            android:textSize="@dimen/font_20"/>
 
     </LinearLayout>
 
@@ -90,14 +78,15 @@
         <ImageView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:src="@drawable/logout" />
+            android:src="@drawable/logout"/>
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginLeft="@dimen/gap_15"
+            android:layout_marginStart="@dimen/gap_15"
             android:text="@string/logout"
-            android:textSize="@dimen/font_20" />
+            android:textSize="@dimen/font_20"/>
 
     </LinearLayout>
 

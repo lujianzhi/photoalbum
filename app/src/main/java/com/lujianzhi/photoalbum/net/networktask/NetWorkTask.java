@@ -7,6 +7,7 @@ import com.lidroid.xutils.http.ResponseInfo;
 import com.lidroid.xutils.http.callback.RequestCallBack;
 import com.lidroid.xutils.http.client.HttpRequest;
 import com.lujianzhi.photoalbum.R;
+import com.lujianzhi.photoalbum.utils.LogUtils;
 import com.lujianzhi.photoalbum.utils.ToastUtils;
 
 /**
@@ -15,9 +16,11 @@ import com.lujianzhi.photoalbum.utils.ToastUtils;
 public abstract class NetWorkTask {
 
     private INetWorkListener netWorkListener;
+    private HttpUtils httpUtils;
 
     public void sendHttpRequest() {
-        HttpUtils httpUtils = new HttpUtils(5000);
+        httpUtils = new HttpUtils();
+        httpUtils.configCookieStore(MyCookieStore.cookieStore);
         httpUtils.send(getHttpMethod(), getUrl(), getRequestParams(), getRequestCallBack());
     }
 
@@ -27,7 +30,7 @@ public abstract class NetWorkTask {
 
     public abstract RequestParams getRequestParams();
 
-    public void setNetWorkListener(INetWorkListener netWorkListener){
+    public void setNetWorkListener(INetWorkListener netWorkListener) {
         this.netWorkListener = netWorkListener;
     }
 
@@ -35,7 +38,9 @@ public abstract class NetWorkTask {
         RequestCallBack<T> requestCallBack = new RequestCallBack<T>() {
             @Override
             public void onSuccess(ResponseInfo<T> responseInfo) {
+
                 if (netWorkListener != null) {
+                    LogUtils.i("网络请求成功 : " + responseInfo.result.toString());
                     netWorkListener.onSuccess(responseInfo);
                 }
             }
@@ -45,6 +50,7 @@ public abstract class NetWorkTask {
                 if (netWorkListener != null) {
                     netWorkListener.onFailure(error, msg);
                 }
+                LogUtils.i("网络请求失败 : " + msg);
                 ToastUtils.showShortToast(R.string.net_request_failure);
             }
         };

@@ -26,6 +26,11 @@ public class User {
      */
     private int sex;
 
+    /**
+     * 用户头像
+     */
+    private String userUrl;
+
     public String getPassword() {
         return password;
     }
@@ -56,5 +61,13 @@ public class User {
 
     public void setUserName(String userName) {
         this.userName = userName;
+    }
+
+    public String getUserUrl() {
+        return userUrl;
+    }
+
+    public void setUserUrl(String userUrl) {
+        this.userUrl = userUrl;
     }
 }

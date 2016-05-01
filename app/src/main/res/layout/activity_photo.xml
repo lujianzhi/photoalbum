@@ -18,28 +18,12 @@
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"/>
 
-    <LinearLayout
+    <com.lujianzhi.photoalbum.ui.viewpager.HackyViewPager
         android:id="@+id/photo_area"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_above="@id/bottom"
-        android:gravity="center"
-        android:layout_below="@id/top">
-
-        <ImageView
-            android:id="@+id/photo"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:src="@drawable/photo"/>
-    </LinearLayout>
-
-
-    <FrameLayout
-        android:id="@+id/comments"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_above="@id/bottom"
         android:layout_below="@id/top"
-        android:visibility="gone"></FrameLayout>
+        android:gravity="center"/>
 
 </RelativeLayout>

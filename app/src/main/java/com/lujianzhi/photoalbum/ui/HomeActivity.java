@@ -2,23 +2,22 @@ package com.lujianzhi.photoalbum.ui;
 
 import android.content.Intent;
 import android.graphics.Color;
-import android.graphics.drawable.ColorDrawable;
+import android.graphics.Rect;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import android.text.TextUtils;
+import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.BaseAdapter;
-import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
 import com.lidroid.xutils.exception.HttpException;
 import com.lidroid.xutils.http.ResponseInfo;
 import com.lujianzhi.photoalbum.R;
@@ -27,9 +26,8 @@ import com.lujianzhi.photoalbum.net.PhotoAlbumManager;
 import com.lujianzhi.photoalbum.net.networktask.INetWorkListener;
 import com.lujianzhi.photoalbum.ui.base.BaseActivity;
 import com.lujianzhi.photoalbum.utils.LogUtils;
-import com.lujianzhi.photoalbum.utils.ViewHolder;
 import com.lujianzhi.photoalbum.view.MyAddAlbumDialog;
-import com.nostra13.universalimageloader.core.ImageLoader;
+import com.lujianzhi.photoalbum.view.MyLongPressDialog;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -38,7 +36,7 @@ public class HomeActivity extends BaseActivity {
     private final String TAG = HomeActivity.class.getName();
 
     private List<PhotoAlbum> photoAlbumsList = new ArrayList<PhotoAlbum>();
-    private GridView photoAlbumView;
+    private RecyclerView photoAlbumView;
     private boolean isFinish;
     private Handler handler = new Handler() {
         @Override
@@ -46,7 +44,7 @@ public class HomeActivity extends BaseActivity {
             isFinish = false;
         }
     };
-    private PhotoAlbumAdapter adapter;
+    private PhotoAlbumRVAdapter adapter;
 
     @Override
     public void onClick(View v) {
@@ -59,12 +57,6 @@ public class HomeActivity extends BaseActivity {
                 break;
             case R.id.add:
                 showAddPhotoAlbum();
-                break;
-            case R.id.comment:
-                Toast.makeText(this, R.string.add_comment_for_album, Toast.LENGTH_SHORT).show();
-                break;
-            case R.id.more:
-                Toast.makeText(this, R.string.show_more_menu_items, Toast.LENGTH_SHORT).show();
                 break;
             default:
                 break;
@@ -86,23 +78,28 @@ public class HomeActivity extends BaseActivity {
 
     @Override
     protected void initViews() {
-        photoAlbumView = (GridView) findViewById(R.id.photo_album);
-        adapter = new PhotoAlbumAdapter();
-//        PhotoAlbumManager.getInstance().getPhotoAlbum(this, adapter);
-        photoAlbumView.setSelector(new ColorDrawable(Color.TRANSPARENT));
-        photoAlbumView.setAdapter(adapter);
-        photoAlbumView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+        photoAlbumView = (RecyclerView) findViewById(R.id.photo_album);
+        photoAlbumView.setLayoutManager(new StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL));
+        SpacesItemDecoration decoration = new SpacesItemDecoration(16);
+        photoAlbumView.addItemDecoration(decoration);
+        adapter = new PhotoAlbumRVAdapter();
+        PhotoAlbumManager.getInstance().getAlbumsRequest(new INetWorkListener() {
             @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                PhotoAlbum photoAlbum = (PhotoAlbum) parent.getItemAtPosition(position);
-                Intent intent = new Intent(HomeActivity.this, PhotoAlbumActivity.class);
-                Bundle data = new Bundle();
-                data.putString("albumName", photoAlbum.getName());
-                data.putInt("albumId", photoAlbum.getId());
-                intent.putExtra("data", data);
-                startActivity(intent);
+            public <T> void onSuccess(ResponseInfo<T> responseInfo) {
+                String jsonStr = responseInfo.result.toString();
+                LogUtils.i(TAG, " album/findAll.do : " + jsonStr);
+
+                adapter.setData(PhotoAlbumManager.getInstance().parserAllAlbum(jsonStr));
+                adapter.notifyDataSetChanged();
+
+            }
+
+            @Override
+            public void onFailure(HttpException error, String msg) {
+
             }
         });
+        photoAlbumView.setAdapter(adapter);
     }
 
     @Override
@@ -114,8 +111,8 @@ public class HomeActivity extends BaseActivity {
         ImageView more = (ImageView) bottom.findViewById(R.id.more);
         back.setOnClickListener(getOnClickListener());
         add.setOnClickListener(getOnClickListener());
-        comment.setOnClickListener(getOnClickListener());
-        more.setOnClickListener(getOnClickListener());
+        comment.setVisibility(View.GONE);
+        more.setVisibility(View.GONE);
     }
 
     @Override
@@ -141,17 +138,18 @@ public class HomeActivity extends BaseActivity {
                     @Override
                     public <T> void onSuccess(ResponseInfo<T> responseInfo) {
                         String responseStr = responseInfo.result.toString();
-                        LogUtils.i(TAG, responseStr);
+                        LogUtils.i(TAG, " album/add.do : " + responseStr);
 
-                        if (PhotoAlbumManager.getInstance().parserAddAlbum(responseStr) == 0) {
-
+                        if (PhotoAlbumManager.getInstance().parserAddAlbum(responseStr) == 1) {
+                            //TODO 添加相册返回时的处理应该于添加相片一样
+                            adapter.addData(PhotoAlbumManager.getInstance().parserAllAlbum(responseStr).get(0));
+                            adapter.notifyDataSetChanged();
                         }
 
                     }
 
                     @Override
                     public void onFailure(HttpException error, String msg) {
-
                     }
                 });
 
@@ -175,43 +173,117 @@ public class HomeActivity extends BaseActivity {
         }
     }
 
-    public class PhotoAlbumAdapter extends BaseAdapter {
-
+    public class PhotoAlbumRVAdapter extends RecyclerView.Adapter<PhotoAlbumRVAdapter.MyViewHolder> {
         public void setData(List<PhotoAlbum> list) {
             photoAlbumsList = list;
         }
 
+        public void addData(PhotoAlbum photoAlbum) {
+            photoAlbumsList.add(photoAlbum);
+        }
+
         @Override
-        public int getCount() {
+        public MyViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+            View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.photo_album_item, null);
+            return new MyViewHolder(view);
+        }
+
+        @Override
+        public void onBindViewHolder(MyViewHolder holder, int position) {
+            final PhotoAlbum photoAlbum = photoAlbumsList.get(position);
+            if (!"null".equals(photoAlbum.getCoverUrl())) {
+                Glide.with(HomeActivity.this).load(photoAlbum.getCoverUrl()).into(holder.albumCover);
+//                Glide.with(HomeActivity.this).load(NetWorkConfig.getHttpApiPath() + photoAlbum.getCoverUrl()).into(holder.albumCover);
+            } else {
+                holder.albumCover.setImageResource(R.drawable.photo);
+            }
+            if (photoAlbum.getType() == 1) {
+                holder.albumName.setTextColor(Color.RED);
+            } else {
+                holder.albumName.setTextColor(Color.BLACK);
+            }
+            holder.albumName.setText(photoAlbum.getName());
+
+            holder.itemView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Intent intent = new Intent(HomeActivity.this, PhotoAlbumActivity.class);
+                    Bundle data = new Bundle();
+                    data.putString("albumName", photoAlbum.getName());
+                    data.putInt("albumId", photoAlbum.getId());
+                    intent.putExtra("data", data);
+                    startActivity(intent);
+                }
+            });
+
+            holder.itemView.setOnLongClickListener(new View.OnLongClickListener() {
+                @Override
+                public boolean onLongClick(View v) {
+                    MyLongPressDialog dialog = new MyLongPressDialog(HomeActivity.this);
+                    dialog.setPositiveClickListener(new MyLongPressDialog.IMyClickListener() {
+                        @Override
+                        public void onClick() {
+                            PhotoAlbumManager.getInstance().deleteAlbumRequest(String.valueOf(photoAlbum.getId()), new INetWorkListener() {
+                                @Override
+                                public <T> void onSuccess(ResponseInfo<T> responseInfo) {
+                                    String jsonStr = responseInfo.result.toString();
+                                    if (1 == PhotoAlbumManager.getInstance().parserDeleteAlbum(jsonStr)) {
+                                        //TODO 删除后返回所有的相册信息
+//                                        adapter.setData();
+//                                        adapter.notifyDataSetChanged();
+                                    }
+                                }
+
+                                @Override
+                                public void onFailure(HttpException error, String msg) {
+
+                                }
+                            });
+                        }
+                    });
+                    dialog.show();
+                    return false;
+                }
+            });
+
+
+        }
+
+        @Override
+        public int getItemCount() {
             return photoAlbumsList.size();
         }
 
-        @Override
-        public Object getItem(int position) {
-            return photoAlbumsList.get(position);
-        }
+        public class MyViewHolder extends RecyclerView.ViewHolder {
 
-        @Override
-        public long getItemId(int position) {
-            return position;
-        }
+            TextView albumName;
+            ImageView albumCover;
 
-        @Override
-        public View getView(int position, View convertView, ViewGroup parent) {
-            if (convertView == null) {
-                convertView = LayoutInflater.from(HomeActivity.this).inflate(R.layout.photo_album_item, null);
+            public MyViewHolder(View itemView) {
+                super(itemView);
+                albumName = (TextView) itemView.findViewById(R.id.name);
+                albumCover = (ImageView) itemView.findViewById(R.id.cover);
             }
-            PhotoAlbum photoAlbum = photoAlbumsList.get(position);
-            TextView albumName = ViewHolder.get(convertView, R.id.name);
-            ImageView albumCover = ViewHolder.get(convertView, R.id.cover);
-            if (!TextUtils.isEmpty(photoAlbum.getCoverUrl())) {
-                ImageLoader.getInstance().displayImage(photoAlbum.getCoverUrl(), albumCover);
-            }
-            if (photoAlbum.getType() == 1) {
-                albumName.setTextColor(Color.RED);
-            }
-            albumName.setText(photoAlbum.getName());
-            return convertView;
         }
     }
+
+    public class SpacesItemDecoration extends RecyclerView.ItemDecoration {
+
+        private int space;
+
+        public SpacesItemDecoration(int space) {
+            this.space = space;
+        }
+
+        @Override
+        public void getItemOffsets(Rect outRect, View view, RecyclerView parent, RecyclerView.State state) {
+            outRect.left = space;
+            outRect.right = space;
+            outRect.bottom = space;
+            if (parent.getChildAdapterPosition(view) == 0) {
+                outRect.top = space;
+            }
+        }
+    }
+
 }
