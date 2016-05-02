@@ -21,6 +21,7 @@ import com.lujianzhi.photoalbum.net.networktask.MyCookieStore;
 import com.lujianzhi.photoalbum.ui.base.BaseActivity;
 import com.lujianzhi.photoalbum.utils.LogUtils;
 import com.lujianzhi.photoalbum.utils.SharedPreferencesUtils;
+import com.lujianzhi.photoalbum.utils.ToastUtils;
 import com.lujianzhi.photoalbum.view.MyRegisterDialog;
 
 import org.apache.http.client.CookieStore;
@@ -122,6 +123,7 @@ public class LoginActivity extends BaseActivity {
             public void onFailure(HttpException e, String s) {
                 LoginActivity.loginState = false;
                 SharedPreferencesUtils.recordLoginState(LoginActivity.this, LoginActivity.loginState);
+                ToastUtils.showShortToast(R.string.net_request_failure);
             }
         });
     }

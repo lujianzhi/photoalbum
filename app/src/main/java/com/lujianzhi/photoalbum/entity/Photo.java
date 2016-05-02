@@ -44,10 +44,12 @@ public class Photo implements Parcelable {
         this.belongId = belongId;
     }
 
+
     protected Photo(Parcel in) {
         id = in.readInt();
         name = in.readString();
         photoUrl = in.readString();
+        comment = in.createTypedArrayList(Comment.CREATOR);
         belongId = in.readInt();
     }
 
@@ -113,6 +115,7 @@ public class Photo implements Parcelable {
         dest.writeInt(id);
         dest.writeString(name);
         dest.writeString(photoUrl);
+        dest.writeTypedList(comment);
         dest.writeInt(belongId);
     }
 }

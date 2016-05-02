@@ -1,5 +1,6 @@
 package com.lujianzhi.photoalbum.net.parser;
 
+import com.lujianzhi.photoalbum.entity.Comment;
 import com.lujianzhi.photoalbum.entity.Photo;
 import com.lujianzhi.photoalbum.entity.PhotoAlbum;
 import com.lujianzhi.photoalbum.utils.ToastUtils;
@@ -19,23 +20,140 @@ public class PhotoAlbumParser extends BaseParser {
     private ArrayList<PhotoAlbum> photoAlbums = new ArrayList<PhotoAlbum>();
     private ArrayList<Photo> photos = new ArrayList<Photo>();
 
+    public ArrayList<PhotoAlbum> getPhotoAlbums() {
+        return photoAlbums;
+    }
+
+    public void setPhotoAlbums(ArrayList<PhotoAlbum> photoAlbums) {
+        this.photoAlbums = photoAlbums;
+    }
+
+    public ArrayList<Photo> getPhotos() {
+        return photos;
+    }
+
+    public void setPhotos(ArrayList<Photo> photos) {
+        this.photos = photos;
+    }
+
     public void clearPhoto() {
         photos.clear();
+    }
+
+    public void clearPhotoAlbum() {
+        photoAlbums.clear();
+    }
+
+    public int parserComment(String jsonStr) {
+        return parseCode(jsonStr);
+    }
+
+    public int parserCoverUrl(String jsonStr) {
+        parseMessage(jsonStr);
+        return parseCode(jsonStr);
+    }
+
+    public int parserDeleteComment(String jsonStr) {
+        return parseCode(jsonStr);
+    }
+
+    public List<Comment> parserAllComment(String jsonStr) {
+        List<Comment> comments = new ArrayList<>();
+        String json = parseMessage(jsonStr);
+        try {
+            JSONArray jsonArray = new JSONArray(json);
+            for (int i = 0; i < jsonArray.length(); i++) {
+                Comment comment = new Comment();
+                JSONObject photoObj = jsonArray.getJSONObject(i);
+                comment.setName(photoObj.getString("name"));
+                comment.setUserId(photoObj.getInt("userId"));
+                comment.setPhotoId(photoObj.getInt("photoId"));
+                comment.setContent(photoObj.getString("content"));
+                comment.setId(photoObj.getInt("id"));
+                comments.add(comment);
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return comments;
+    }
+
+    public List<PhotoAlbum> parserAllDeletePhoto(String jsonStr) {
+        String json = parseMessage(jsonStr);
+        try {
+            JSONArray jsonArray = new JSONArray(json);
+            for (int i = 0; i < jsonArray.length(); i++) {
+                PhotoAlbum photoAlbum = new PhotoAlbum();
+                JSONObject photoObj = jsonArray.getJSONObject(i);
+                photoAlbum.setId(Integer.valueOf(photoObj.getString("id")));
+                photoAlbum.setName(photoObj.getString("name"));
+                photoAlbum.setType(Integer.valueOf(photoObj.getString("type")));
+                photoAlbum.setCoverUrl(photoObj.getString("coverUrl"));
+                photoAlbums.add(photoAlbum);
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return photoAlbums;
     }
 
     public int parserDeleteAlbum(String jsonStr) {
         return parseCode(jsonStr);
     }
 
+    public Photo parserSinglePhoto(String jsonStr) {
+        String json = parseMessage(jsonStr);
+        Photo photo = new Photo();
+        try {
+            JSONArray jsonArray = new JSONArray(json);
+            JSONObject photoObj = jsonArray.getJSONObject(0);
+            JSONArray commentArray = photoObj.getJSONArray("comments");
+            ArrayList<Comment> comments = new ArrayList<>();
+            for (int i = 0; i < commentArray.length(); i++) {
+                JSONObject commentObj = commentArray.getJSONObject(i);
+                if (commentObj != null) {
+                    Comment comment = new Comment();
+                    comment.setContent(commentObj.getString("content"));
+                    comment.setDate(commentObj.getString("date"));
+                    comment.setId(commentObj.getInt("id"));
+                    comment.setName(commentObj.getString("name"));
+                    comment.setPhotoId(commentObj.getInt("photoId"));
+                    comment.setUserId(commentObj.getInt("userId"));
+                    comments.add(comment);
+                }
+            }
+            photo.setComment(comments);
+            photo.setPhotoUrl(photoObj.getString("photoUrl"));
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return photo;
+    }
+
     public List<Photo> parserAllPhoto(String jsonStr) {
+        photos.clear();
         String json = parseMessage(jsonStr);
         try {
             JSONArray jsonArray = new JSONArray(json);
             for (int i = 0; i < jsonArray.length(); i++) {
                 Photo photo = new Photo();
                 JSONObject photoObj = jsonArray.getJSONObject(i);
-                //TODO 设置photo的评论和url
-//                photo.setComment();
+                JSONArray commentArray = photoObj.getJSONArray("comments");
+                ArrayList<Comment> comments = new ArrayList<>();
+                for (int j = 0; j < commentArray.length(); j++) {
+                    JSONObject commentObj = commentArray.getJSONObject(j);
+                    if (commentObj != null) {
+                        Comment comment = new Comment();
+                        comment.setContent(commentObj.getString("content"));
+                        comment.setDate(commentObj.getString("date"));
+                        comment.setId(commentObj.getInt("id"));
+                        comment.setName(commentObj.getString("name"));
+                        comment.setPhotoId(commentObj.getInt("photoId"));
+                        comment.setUserId(commentObj.getInt("userId"));
+                        comments.add(comment);
+                    }
+                }
+                photo.setComment(comments);
                 photo.setPhotoUrl(photoObj.getString("photoUrl"));
                 photos.add(photo);
             }
@@ -47,6 +165,22 @@ public class PhotoAlbumParser extends BaseParser {
 
     public int parserAddPhoto(String jsonStr) {
         return parseCode(jsonStr);
+    }
+
+    public PhotoAlbum parserSingleAlbum(String jsonStr) {
+        String json = parseMessage(jsonStr);
+        PhotoAlbum photoAlbum = new PhotoAlbum();
+        try {
+            JSONArray jsonArray = new JSONArray(json);
+            JSONObject photoAlbumObj = jsonArray.getJSONObject(0);
+            photoAlbum.setCoverUrl(photoAlbumObj.getString("coverUrl"));
+            photoAlbum.setId(photoAlbumObj.getInt("id"));
+            photoAlbum.setName(photoAlbumObj.getString("name"));
+            photoAlbum.setType(photoAlbumObj.getInt("type"));
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return photoAlbum;
     }
 
     public List<PhotoAlbum> parserAllAlbum(String jsonStr) {

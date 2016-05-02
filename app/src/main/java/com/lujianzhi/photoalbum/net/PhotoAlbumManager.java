@@ -1,5 +1,6 @@
 package com.lujianzhi.photoalbum.net;
 
+import com.lujianzhi.photoalbum.entity.Comment;
 import com.lujianzhi.photoalbum.entity.Photo;
 import com.lujianzhi.photoalbum.entity.PhotoAlbum;
 import com.lujianzhi.photoalbum.net.network.PhotoAlbumNetWork;
@@ -18,8 +19,6 @@ public class PhotoAlbumManager {
     private volatile static PhotoAlbumManager instance;
     private PhotoAlbumParser photoAlbumParser;
     private PhotoAlbumNetWork photoAlbumNetWork;
-    private ArrayList<PhotoAlbum> photoAlbums = new ArrayList<PhotoAlbum>();
-    private ArrayList<Photo> photos = new ArrayList<Photo>();
 
     private PhotoAlbumManager() {
         photoAlbumNetWork = new PhotoAlbumNetWork();
@@ -37,8 +36,60 @@ public class PhotoAlbumManager {
         return instance;
     }
 
+    public int parserDeleteComment(String jsonStr) {
+        return photoAlbumParser.parserDeleteComment(jsonStr);
+    }
+
+    public void deleteCommentRequest(int commentId, INetWorkListener netWorkListener) {
+        photoAlbumNetWork.deleteCommentRequest(commentId, netWorkListener);
+    }
+
+    public ArrayList<PhotoAlbum> getPhotoAlbums() {
+        return photoAlbumParser.getPhotoAlbums();
+    }
+
+    public void setPhotoAlbums(ArrayList<PhotoAlbum> photoAlbums) {
+        photoAlbumParser.setPhotoAlbums(photoAlbums);
+    }
+
+    public ArrayList<Photo> getPhotos() {
+        return photoAlbumParser.getPhotos();
+    }
+
+    public void setPhotos(ArrayList<Photo> photos) {
+        photoAlbumParser.setPhotos(photos);
+    }
+
     public void clearPhoto() {
         photoAlbumParser.clearPhoto();
+    }
+
+    public void clearPhotoAlbum() {
+        photoAlbumParser.clearPhotoAlbum();
+    }
+
+    public List<Comment> parserAllComment(String jsonStr) {
+        return photoAlbumParser.parserAllComment(jsonStr);
+    }
+
+    public int parserComment(String jsonStr) {
+        return photoAlbumParser.parserComment(jsonStr);
+    }
+
+    public void commitCommentRequest(String commitContent, int photoId, INetWorkListener netWorkListener) {
+        photoAlbumNetWork.commitCommentRequest(commitContent, photoId, netWorkListener);
+    }
+
+    public int parseCoverUrl(String jsonStr) {
+        return photoAlbumParser.parserCoverUrl(jsonStr);
+    }
+
+    public void setCoverRequest(String photoUrl, int albumId, INetWorkListener netWorkListener) {
+        photoAlbumNetWork.setCoverRequest(photoUrl, albumId, netWorkListener);
+    }
+
+    public Photo parserSinglePhoto(String jsonStr) {
+        return photoAlbumParser.parserSinglePhoto(jsonStr);
     }
 
     public List<Photo> parserAllPhoto(String jsonStr) {
@@ -57,12 +108,20 @@ public class PhotoAlbumManager {
         photoAlbumNetWork.addPhotoRequest(belongId, file, photoName, netWorkListener);
     }
 
+    public List<PhotoAlbum> parserAllDeletePhoto(String jsonStr) {
+        return photoAlbumParser.parserAllDeletePhoto(jsonStr);
+    }
+
     public int parserDeleteAlbum(String jsonStr) {
         return photoAlbumParser.parserDeleteAlbum(jsonStr);
     }
 
     public void deleteAlbumRequest(String id, INetWorkListener netWorkListener) {
         photoAlbumNetWork.deleteAlbumRequest(id, netWorkListener);
+    }
+
+    public PhotoAlbum parserSingleAlbum(String jsonStr) {
+        return photoAlbumParser.parserSingleAlbum(jsonStr);
     }
 
     public List<PhotoAlbum> parserAllAlbum(String jsonStr) {

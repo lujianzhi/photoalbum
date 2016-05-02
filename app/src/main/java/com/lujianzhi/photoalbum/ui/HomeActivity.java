@@ -2,7 +2,6 @@ package com.lujianzhi.photoalbum.ui;
 
 import android.content.Intent;
 import android.graphics.Color;
-import android.graphics.Rect;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -21,6 +20,8 @@ import com.bumptech.glide.Glide;
 import com.lidroid.xutils.exception.HttpException;
 import com.lidroid.xutils.http.ResponseInfo;
 import com.lujianzhi.photoalbum.R;
+import com.lujianzhi.photoalbum.adapter.SpacesItemDecoration;
+import com.lujianzhi.photoalbum.config.NetWorkConfig;
 import com.lujianzhi.photoalbum.entity.PhotoAlbum;
 import com.lujianzhi.photoalbum.net.PhotoAlbumManager;
 import com.lujianzhi.photoalbum.net.networktask.INetWorkListener;
@@ -35,7 +36,6 @@ import java.util.List;
 public class HomeActivity extends BaseActivity {
     private final String TAG = HomeActivity.class.getName();
 
-    private List<PhotoAlbum> photoAlbumsList = new ArrayList<PhotoAlbum>();
     private RecyclerView photoAlbumView;
     private boolean isFinish;
     private Handler handler = new Handler() {
@@ -83,22 +83,6 @@ public class HomeActivity extends BaseActivity {
         SpacesItemDecoration decoration = new SpacesItemDecoration(16);
         photoAlbumView.addItemDecoration(decoration);
         adapter = new PhotoAlbumRVAdapter();
-        PhotoAlbumManager.getInstance().getAlbumsRequest(new INetWorkListener() {
-            @Override
-            public <T> void onSuccess(ResponseInfo<T> responseInfo) {
-                String jsonStr = responseInfo.result.toString();
-                LogUtils.i(TAG, " album/findAll.do : " + jsonStr);
-
-                adapter.setData(PhotoAlbumManager.getInstance().parserAllAlbum(jsonStr));
-                adapter.notifyDataSetChanged();
-
-            }
-
-            @Override
-            public void onFailure(HttpException error, String msg) {
-
-            }
-        });
         photoAlbumView.setAdapter(adapter);
     }
 
@@ -108,11 +92,9 @@ public class HomeActivity extends BaseActivity {
         ImageView back = (ImageView) bottom.findViewById(R.id.back);
         ImageView add = (ImageView) bottom.findViewById(R.id.add);
         ImageView comment = (ImageView) bottom.findViewById(R.id.comment);
-        ImageView more = (ImageView) bottom.findViewById(R.id.more);
         back.setOnClickListener(getOnClickListener());
         add.setOnClickListener(getOnClickListener());
         comment.setVisibility(View.GONE);
-        more.setVisibility(View.GONE);
     }
 
     @Override
@@ -141,8 +123,7 @@ public class HomeActivity extends BaseActivity {
                         LogUtils.i(TAG, " album/add.do : " + responseStr);
 
                         if (PhotoAlbumManager.getInstance().parserAddAlbum(responseStr) == 1) {
-                            //TODO 添加相册返回时的处理应该于添加相片一样
-                            adapter.addData(PhotoAlbumManager.getInstance().parserAllAlbum(responseStr).get(0));
+                            adapter.addData(PhotoAlbumManager.getInstance().parserSingleAlbum(responseStr));
                             adapter.notifyDataSetChanged();
                         }
 
@@ -174,12 +155,13 @@ public class HomeActivity extends BaseActivity {
     }
 
     public class PhotoAlbumRVAdapter extends RecyclerView.Adapter<PhotoAlbumRVAdapter.MyViewHolder> {
-        public void setData(List<PhotoAlbum> list) {
-            photoAlbumsList = list;
-        }
 
         public void addData(PhotoAlbum photoAlbum) {
-            photoAlbumsList.add(photoAlbum);
+            PhotoAlbumManager.getInstance().getPhotoAlbums().add(photoAlbum);
+        }
+
+        public void setData(List<PhotoAlbum> list) {
+            PhotoAlbumManager.getInstance().setPhotoAlbums((ArrayList<PhotoAlbum>) list);
         }
 
         @Override
@@ -190,10 +172,9 @@ public class HomeActivity extends BaseActivity {
 
         @Override
         public void onBindViewHolder(MyViewHolder holder, int position) {
-            final PhotoAlbum photoAlbum = photoAlbumsList.get(position);
+            final PhotoAlbum photoAlbum = PhotoAlbumManager.getInstance().getPhotoAlbums().get(position);
             if (!"null".equals(photoAlbum.getCoverUrl())) {
-                Glide.with(HomeActivity.this).load(photoAlbum.getCoverUrl()).into(holder.albumCover);
-//                Glide.with(HomeActivity.this).load(NetWorkConfig.getHttpApiPath() + photoAlbum.getCoverUrl()).into(holder.albumCover);
+                Glide.with(HomeActivity.this).load(NetWorkConfig.getHttpApiPath() + photoAlbum.getCoverUrl()).into(holder.albumCover);
             } else {
                 holder.albumCover.setImageResource(R.drawable.photo);
             }
@@ -227,10 +208,10 @@ public class HomeActivity extends BaseActivity {
                                 @Override
                                 public <T> void onSuccess(ResponseInfo<T> responseInfo) {
                                     String jsonStr = responseInfo.result.toString();
-                                    if (1 == PhotoAlbumManager.getInstance().parserDeleteAlbum(jsonStr)) {
-                                        //TODO 删除后返回所有的相册信息
-//                                        adapter.setData();
-//                                        adapter.notifyDataSetChanged();
+                                    if (PhotoAlbumManager.getInstance().parserDeleteAlbum(jsonStr) == 1) {
+                                        PhotoAlbumManager.getInstance().clearPhotoAlbum();
+                                        adapter.setData(PhotoAlbumManager.getInstance().parserAllDeletePhoto(jsonStr));
+                                        adapter.notifyDataSetChanged();
                                     }
                                 }
 
@@ -251,7 +232,7 @@ public class HomeActivity extends BaseActivity {
 
         @Override
         public int getItemCount() {
-            return photoAlbumsList.size();
+            return PhotoAlbumManager.getInstance().getPhotoAlbums().size();
         }
 
         public class MyViewHolder extends RecyclerView.ViewHolder {
@@ -267,23 +248,24 @@ public class HomeActivity extends BaseActivity {
         }
     }
 
-    public class SpacesItemDecoration extends RecyclerView.ItemDecoration {
+    @Override
+    protected void onResume() {
+        super.onResume();
+        PhotoAlbumManager.getInstance().getAlbumsRequest(new INetWorkListener() {
+            @Override
+            public <T> void onSuccess(ResponseInfo<T> responseInfo) {
+                String jsonStr = responseInfo.result.toString();
+                LogUtils.i(TAG, " album/findAll.do : " + jsonStr);
+                PhotoAlbumManager.getInstance().clearPhotoAlbum();
+                adapter.setData(PhotoAlbumManager.getInstance().parserAllAlbum(jsonStr));
+                adapter.notifyDataSetChanged();
 
-        private int space;
-
-        public SpacesItemDecoration(int space) {
-            this.space = space;
-        }
-
-        @Override
-        public void getItemOffsets(Rect outRect, View view, RecyclerView parent, RecyclerView.State state) {
-            outRect.left = space;
-            outRect.right = space;
-            outRect.bottom = space;
-            if (parent.getChildAdapterPosition(view) == 0) {
-                outRect.top = space;
             }
-        }
-    }
 
+            @Override
+            public void onFailure(HttpException error, String msg) {
+
+            }
+        });
+    }
 }

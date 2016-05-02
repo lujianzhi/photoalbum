@@ -54,6 +54,7 @@
     <string name="photoAlbum_insert_album_name">请输入相册名</string>
     <string name="photoAlbum_public">公开</string>
     <string name="photoAlbum_private">不公开</string>
+    <string name="photoAlbum_set_cover">将此照片设置为封面?</string>
 
     <!-- 网络请求-->
     <string name="net_request_failure">网络请求失败</string>
@@ -64,5 +65,16 @@
     <!--长按菜单-->
     <string name="delete_photo_album">删除该相册?</string>
 
+    <!--评论-->
+    <string name="comment_hint">请输入评论</string>
+    <string name="comment_commit">评论</string>
+    <string name="comment_user_name">评论人</string>
+    <string name="comment_content">评论内容</string>
+    <string name="comment_time">评论时间</string>
+    <string name="comment_failure">评论失败</string>
+    <string name="delete_comment">删除评论?</string>
+    <string name="delete_other_people_comment">不能删除别人的评论</string>
+    <string name="delete_successfully">删除成功</string>
+    <string name="delete_failure">删除失败</string>
 
 </resources>

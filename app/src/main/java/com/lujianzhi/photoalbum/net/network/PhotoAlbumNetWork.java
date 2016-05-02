@@ -15,6 +15,77 @@ import java.io.File;
  */
 public class PhotoAlbumNetWork {
 
+    public void deleteCommentRequest(final int commentId, INetWorkListener netWorkListener) {
+        NetWorkTask netWorkTask = new NetWorkTask() {
+            @Override
+            public HttpRequest.HttpMethod getHttpMethod() {
+                return HttpRequest.HttpMethod.POST;
+            }
+
+            @Override
+            public String getUrl() {
+                return NetWorkConfig.getHttpApiPath() + "/comment/delete.do";
+            }
+
+            @Override
+            public RequestParams getRequestParams() {
+                RequestParams params = new RequestParams();
+                params.addBodyParameter("id", String.valueOf(commentId));
+                return params;
+            }
+        };
+        netWorkTask.setNetWorkListener(netWorkListener);
+        netWorkTask.sendHttpRequest();
+    }
+
+    public void commitCommentRequest(final String commentContent, final int photoId, INetWorkListener netWorkListener) {
+        NetWorkTask netWorkTask = new NetWorkTask() {
+            @Override
+            public HttpRequest.HttpMethod getHttpMethod() {
+                return HttpRequest.HttpMethod.POST;
+            }
+
+            @Override
+            public String getUrl() {
+                return NetWorkConfig.getHttpApiPath() + "/comment/add.do";
+            }
+
+            @Override
+            public RequestParams getRequestParams() {
+                RequestParams params = new RequestParams();
+                params.addBodyParameter("content", commentContent);
+                params.addBodyParameter("photoId", String.valueOf(photoId));
+                return params;
+            }
+        };
+        netWorkTask.setNetWorkListener(netWorkListener);
+        netWorkTask.sendHttpRequest();
+    }
+
+    public void setCoverRequest(final String photoUrl, final int albumId, INetWorkListener netWorkListener) {
+        NetWorkTask netWorkTask = new NetWorkTask() {
+            @Override
+            public HttpRequest.HttpMethod getHttpMethod() {
+                return HttpRequest.HttpMethod.POST;
+            }
+
+            @Override
+            public String getUrl() {
+                return NetWorkConfig.getHttpApiPath() + "/album/setCover.do";
+            }
+
+            @Override
+            public RequestParams getRequestParams() {
+                RequestParams params = new RequestParams();
+                params.addBodyParameter("url", photoUrl);
+                params.addBodyParameter("id", String.valueOf(albumId));
+                return params;
+            }
+        };
+        netWorkTask.setNetWorkListener(netWorkListener);
+        netWorkTask.sendHttpRequest();
+    }
+
     public void getAllPhoto(final String belongId, INetWorkListener netWorkListener) {
         NetWorkTask netWorkTask = new NetWorkTask() {
             @Override

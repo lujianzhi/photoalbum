@@ -11,18 +11,26 @@
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"/>
 
-    <include
-        android:id="@+id/bottom"
-        layout="@layout/bottom_layout"
+
+    <ScrollView
+        android:id="@+id/bottom_scroll"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"/>
+        android:layout_alignParentBottom="true">
+
+        <include
+            android:id="@+id/bottom"
+            layout="@layout/bottom_layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"/>
+
+    </ScrollView>
 
     <com.lujianzhi.photoalbum.ui.viewpager.HackyViewPager
         android:id="@+id/photo_area"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_above="@id/bottom"
+        android:layout_above="@id/bottom_scroll"
         android:layout_below="@id/top"
         android:gravity="center"/>
 

@@ -7,6 +7,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,9 +21,9 @@ import com.bumptech.glide.Glide;
 import com.lidroid.xutils.exception.HttpException;
 import com.lidroid.xutils.http.ResponseInfo;
 import com.lujianzhi.photoalbum.R;
+import com.lujianzhi.photoalbum.adapter.SpacesItemDecoration;
 import com.lujianzhi.photoalbum.config.NetWorkConfig;
 import com.lujianzhi.photoalbum.entity.Photo;
-import com.lujianzhi.photoalbum.entity.PhotoAlbum;
 import com.lujianzhi.photoalbum.net.PhotoAlbumManager;
 import com.lujianzhi.photoalbum.net.networktask.INetWorkListener;
 import com.lujianzhi.photoalbum.ui.base.BaseActivity;
@@ -42,8 +43,6 @@ public class PhotoAlbumActivity extends BaseActivity {
     private static final String TAG = PhotoAlbumActivity.class.getName();
 
     private RecyclerView photosView;
-    private List<Photo> photoList = new ArrayList<Photo>();
-    private PhotoAlbum photoAlbum;
     private String albumName;
     private int albumId;
     private PhotoRVAdapter adapter;
@@ -65,24 +64,11 @@ public class PhotoAlbumActivity extends BaseActivity {
     @Override
     protected void initViews() {
         photosView = (RecyclerView) findViewById(R.id.photos);
+        photosView.setLayoutManager(new StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL));
+        SpacesItemDecoration decoration = new SpacesItemDecoration(16);
+        photosView.addItemDecoration(decoration);
         adapter = new PhotoRVAdapter();
         photosView.setAdapter(adapter);
-        PhotoAlbumManager.getInstance().getAllPhoto(String.valueOf(albumId), new INetWorkListener() {
-            @Override
-            public <T> void onSuccess(ResponseInfo<T> responseInfo) {
-                String resultStr = responseInfo.result.toString();
-                LogUtils.i(TAG, " photo/findAll.do : " + resultStr);
-                PhotoAlbumManager.getInstance().clearPhoto();
-                adapter.setData(PhotoAlbumManager.getInstance().parserAllPhoto(resultStr));
-                adapter.notifyDataSetChanged();
-            }
-
-            @Override
-            public void onFailure(HttpException error, String msg) {
-
-            }
-        });
-
     }
 
     @Override
@@ -91,11 +77,9 @@ public class PhotoAlbumActivity extends BaseActivity {
         ImageView back = (ImageView) bottom.findViewById(R.id.back);
         ImageView add = (ImageView) bottom.findViewById(R.id.add);
         ImageView comment = (ImageView) bottom.findViewById(R.id.comment);
-        ImageView more = (ImageView) bottom.findViewById(R.id.more);
         back.setOnClickListener(getOnClickListener());
         add.setOnClickListener(getOnClickListener());
         comment.setOnClickListener(getOnClickListener());
-        more.setOnClickListener(getOnClickListener());
     }
 
     @Override
@@ -153,7 +137,7 @@ public class PhotoAlbumActivity extends BaseActivity {
 
                                 if (PhotoAlbumManager.getInstance().parserAddPhoto(resultStr) == 1) {
                                     ToastUtils.showShortToast("保存相片成功");
-                                    PhotoAlbumManager.getInstance().parserAllPhoto(resultStr).get(0);
+                                    adapter.addData(PhotoAlbumManager.getInstance().parserSinglePhoto(resultStr));
                                     adapter.notifyDataSetChanged();
                                 } else {
                                     ToastUtils.showShortToast("保存相片失败");
@@ -189,9 +173,6 @@ public class PhotoAlbumActivity extends BaseActivity {
             case R.id.comment:
                 Toast.makeText(this, "添加对相册的评论", Toast.LENGTH_SHORT).show();
                 break;
-            case R.id.more:
-                Toast.makeText(this, "弹出更多菜单", Toast.LENGTH_SHORT).show();
-                break;
             default:
                 break;
         }
@@ -199,23 +180,28 @@ public class PhotoAlbumActivity extends BaseActivity {
 
 
     public class PhotoRVAdapter extends RecyclerView.Adapter<PhotoRVAdapter.MyViewHolder> {
+
+        public void addData(Photo photo) {
+            PhotoAlbumManager.getInstance().getPhotos().add(photo);
+        }
+
         public void setData(List<Photo> photos) {
-            photoList = photos;
+            PhotoAlbumManager.getInstance().setPhotos((ArrayList<Photo>) photos);
         }
 
         public void clearData() {
-            photoList.clear();
+            PhotoAlbumManager.getInstance().clearPhoto();
         }
 
         @Override
         public MyViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-            View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.photo_album_item, null);
+            View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.photo_item, null);
             return new MyViewHolder(view);
         }
 
         @Override
         public void onBindViewHolder(MyViewHolder holder, final int position) {
-            final Photo photo = photoList.get(position);
+            final Photo photo = PhotoAlbumManager.getInstance().getPhotos().get(position);
             if (!"null".equals(photo.getPhotoUrl())) {
                 Glide.with(PhotoAlbumActivity.this).load(NetWorkConfig.getHttpApiPath() + photo.getPhotoUrl()).into(holder.photoImage);
             } else {
@@ -227,7 +213,7 @@ public class PhotoAlbumActivity extends BaseActivity {
                 public void onClick(View v) {
                     Intent intent = new Intent(PhotoAlbumActivity.this, PhotoActivity.class);
                     Bundle data = new Bundle();
-                    data.putParcelableArrayList("photoList", (ArrayList<Photo>) photoList);
+                    data.putParcelableArrayList("photoList", PhotoAlbumManager.getInstance().getPhotos());
                     data.putInt("position", position);
                     intent.putExtra("data", data);
                     startActivity(intent);
@@ -238,18 +224,15 @@ public class PhotoAlbumActivity extends BaseActivity {
                 @Override
                 public boolean onLongClick(View v) {
                     MyLongPressDialog dialog = new MyLongPressDialog(PhotoAlbumActivity.this);
+                    dialog.setConfirmText(R.string.photoAlbum_set_cover);
                     dialog.setPositiveClickListener(new MyLongPressDialog.IMyClickListener() {
                         @Override
                         public void onClick() {
-                            PhotoAlbumManager.getInstance().deleteAlbumRequest(String.valueOf(photo.getId()), new INetWorkListener() {
+                            PhotoAlbumManager.getInstance().setCoverRequest(String.valueOf(photo.getPhotoUrl()), albumId, new INetWorkListener() {
                                 @Override
                                 public <T> void onSuccess(ResponseInfo<T> responseInfo) {
                                     String jsonStr = responseInfo.result.toString();
-                                    if (1 == PhotoAlbumManager.getInstance().parserDeleteAlbum(jsonStr)) {
-                                        //TODO 删除后返回所有的相册信息
-//                                        adapter.setData();
-//                                        adapter.notifyDataSetChanged();
-                                    }
+                                    PhotoAlbumManager.getInstance().parseCoverUrl(jsonStr);
                                 }
 
                                 @Override
@@ -264,12 +247,11 @@ public class PhotoAlbumActivity extends BaseActivity {
                 }
             });
 
-
         }
 
         @Override
         public int getItemCount() {
-            return photoList.size();
+            return PhotoAlbumManager.getInstance().getPhotos().size();
         }
 
         public class MyViewHolder extends RecyclerView.ViewHolder {
@@ -278,9 +260,29 @@ public class PhotoAlbumActivity extends BaseActivity {
 
             public MyViewHolder(View itemView) {
                 super(itemView);
-                photoImage = (ImageView) itemView.findViewById(R.id.cover);
+                photoImage = (ImageView) itemView.findViewById(R.id.photo);
             }
         }
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        PhotoAlbumManager.getInstance().getAllPhoto(String.valueOf(albumId), new INetWorkListener() {
+            @Override
+            public <T> void onSuccess(ResponseInfo<T> responseInfo) {
+                String resultStr = responseInfo.result.toString();
+                LogUtils.i(TAG, " photo/findAll.do : " + resultStr);
+                PhotoAlbumManager.getInstance().clearPhoto();
+                adapter.setData(PhotoAlbumManager.getInstance().parserAllPhoto(resultStr));
+                adapter.notifyDataSetChanged();
+            }
+
+            @Override
+            public void onFailure(HttpException error, String msg) {
+
+            }
+        });
+
+    }
 }
