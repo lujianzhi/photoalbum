@@ -229,6 +229,27 @@ public class PhotoAlbumNetWork {
         netWorkTask.sendHttpRequest();
     }
 
+    public void getUserAlbumsRequest(INetWorkListener netWorkListener) {
+        NetWorkTask netWorkTask = new NetWorkTask() {
+            @Override
+            public HttpRequest.HttpMethod getHttpMethod() {
+                return HttpRequest.HttpMethod.POST;
+            }
+
+            @Override
+            public String getUrl() {
+                return NetWorkConfig.getHttpApiPath() + "/album/findUserAll.do";
+            }
+
+            @Override
+            public RequestParams getRequestParams() {
+                return null;
+            }
+        };
+        netWorkTask.setNetWorkListener(netWorkListener);
+        netWorkTask.sendHttpRequest();
+    }
+
     public void getAlbumsRequest(INetWorkListener netWorkListener) {
         NetWorkTask netWorkTask = new NetWorkTask() {
             @Override

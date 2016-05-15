@@ -41,6 +41,7 @@
     <!--个人主页-->
     <string name="user_center">个人主页</string>
     <string name="nick_name">昵称</string>
+    <string name="personal_album">个人相册</string>
     <string name="edit">编辑信息</string>
     <string name="logout">退出登录</string>
 

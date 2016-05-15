@@ -52,9 +52,11 @@ public class UserCenterActivity extends BaseActivity {
 
         LinearLayout edit_area = (LinearLayout) findViewById(R.id.edit_area);
         LinearLayout logout_area = (LinearLayout) findViewById(R.id.logout_area);
+        LinearLayout personal_album_area = (LinearLayout) findViewById(R.id.personal_album_area);
 
         logout_area.setOnClickListener(getOnClickListener());
         edit_area.setOnClickListener(getOnClickListener());
+        personal_album_area.setOnClickListener(getOnClickListener());
     }
 
     @Override
@@ -78,6 +80,9 @@ public class UserCenterActivity extends BaseActivity {
             case R.id.back:
                 finish();
                 break;
+            case R.id.personal_album_area:
+                intoPersonalAlbum();
+                break;
             case R.id.edit_area:
                 showEditDialog();
                 break;
@@ -87,6 +92,10 @@ public class UserCenterActivity extends BaseActivity {
                 startActivity(new Intent(this, LoginActivity.class));
                 break;
         }
+    }
+
+    private void intoPersonalAlbum() {
+        startActivity(new Intent(this, PersonalAlbumActivity.class));
     }
 
     private void showEditDialog() {

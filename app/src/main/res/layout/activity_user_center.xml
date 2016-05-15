@@ -39,11 +39,37 @@
     </LinearLayout>
 
     <LinearLayout
-        android:id="@+id/edit_area"
+        android:id="@+id/personal_album_area"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@id/user_info_area"
         android:layout_marginTop="@dimen/gap_20"
+        android:background="@color/color11"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:padding="@dimen/gap_10">
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/album"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="@dimen/gap_15"
+            android:layout_marginStart="@dimen/gap_15"
+            android:text="@string/personal_album"
+            android:textSize="@dimen/font_20"/>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/edit_area"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/personal_album_area"
+        android:layout_marginTop="@dimen/gap_1"
         android:background="@color/color11"
         android:gravity="center_vertical"
         android:orientation="horizontal"

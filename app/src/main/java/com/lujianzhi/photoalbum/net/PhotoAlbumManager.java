@@ -52,10 +52,6 @@ public class PhotoAlbumManager {
         photoAlbumParser.setPhotos(photos);
     }
 
-    public void setComments(ArrayList<Comment> photos) {
-
-    }
-
     public void clearPhoto() {
         photoAlbumParser.clearPhoto();
     }
@@ -150,6 +146,10 @@ public class PhotoAlbumManager {
 
     public List<PhotoAlbum> parserAllAlbum(String jsonStr) {
         return photoAlbumParser.parserAllAlbum(jsonStr);
+    }
+
+    public void getUserAlbumsRequest(INetWorkListener netWorkListener) {
+        photoAlbumNetWork.getUserAlbumsRequest(netWorkListener);
     }
 
     public void getAlbumsRequest(INetWorkListener netWorkListener) {

@@ -21,6 +21,7 @@ import com.lidroid.xutils.exception.HttpException;
 import com.lidroid.xutils.http.ResponseInfo;
 import com.lujianzhi.photoalbum.R;
 import com.lujianzhi.photoalbum.adapter.SpacesItemDecoration;
+import com.lujianzhi.photoalbum.config.NetWorkConfig;
 import com.lujianzhi.photoalbum.entity.PhotoAlbum;
 import com.lujianzhi.photoalbum.net.PhotoAlbumManager;
 import com.lujianzhi.photoalbum.net.networktask.INetWorkListener;
@@ -33,17 +34,18 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class HomeActivity extends BaseActivity {
-    private final String TAG = HomeActivity.class.getName();
+    protected final String TAG = HomeActivity.class.getName();
 
-    private RecyclerView photoAlbumView;
-    private boolean isFinish;
-    private Handler handler = new Handler() {
+    protected RecyclerView photoAlbumView;
+    protected boolean isFinish;
+    protected Handler handler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
             isFinish = false;
         }
     };
-    private PhotoAlbumRVAdapter adapter;
+    protected PhotoAlbumRVAdapter adapter;
+    protected boolean isNeedParentResume = true;
 
     @Override
     public void onClick(View v) {
@@ -110,7 +112,7 @@ public class HomeActivity extends BaseActivity {
     protected void initData() {
     }
 
-    private void showAddPhotoAlbum() {
+    protected void showAddPhotoAlbum() {
         final MyAddAlbumDialog dialog = new MyAddAlbumDialog(this);
         dialog.setPositiveClickListener(new MyAddAlbumDialog.IMyClickListener() {
             @Override
@@ -143,7 +145,7 @@ public class HomeActivity extends BaseActivity {
         isExit();
     }
 
-    private void isExit() {
+    protected void isExit() {
         if (isFinish) {
             finish();
         } else {
@@ -163,6 +165,12 @@ public class HomeActivity extends BaseActivity {
             PhotoAlbumManager.getInstance().setPhotoAlbums((ArrayList<PhotoAlbum>) list);
         }
 
+        public void clearData() {
+            PhotoAlbumManager.getInstance().clearPhotoAlbum();
+            adapter.setData(PhotoAlbumManager.getInstance().getPhotoAlbums());
+            adapter.notifyDataSetChanged();
+        }
+
         @Override
         public MyViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
             View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.photo_album_item, null);
@@ -173,8 +181,7 @@ public class HomeActivity extends BaseActivity {
         public void onBindViewHolder(MyViewHolder holder, int position) {
             final PhotoAlbum photoAlbum = PhotoAlbumManager.getInstance().getPhotoAlbums().get(position);
             if (!"null".equals(photoAlbum.getCoverUrl())) {
-//                Glide.with(HomeActivity.this).load(NetWorkConfig.getHttpApiPath() + photoAlbum.getCoverUrl()).into(holder.albumCover);
-                Glide.with(HomeActivity.this).load(photoAlbum.getCoverUrl()).into(holder.albumCover);
+                Glide.with(HomeActivity.this).load(NetWorkConfig.getHttpApiPath() + photoAlbum.getCoverUrl()).into(holder.albumCover);
             } else {
                 holder.albumCover.setImageResource(R.drawable.cover);
             }
@@ -252,20 +259,24 @@ public class HomeActivity extends BaseActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        PhotoAlbumManager.getInstance().getAlbumsRequest(new INetWorkListener() {
-            @Override
-            public <T> void onSuccess(ResponseInfo<T> responseInfo) {
-                String jsonStr = responseInfo.result.toString();
-                LogUtils.i(TAG, " album/findAll.do : " + jsonStr);
-                PhotoAlbumManager.getInstance().clearPhotoAlbum();
-                adapter.setData(PhotoAlbumManager.getInstance().parserAllAlbum(jsonStr));
-                adapter.notifyDataSetChanged();
-            }
 
-            @Override
-            public void onFailure(HttpException error, String msg) {
+        if(isNeedParentResume){
+            PhotoAlbumManager.getInstance().getAlbumsRequest(new INetWorkListener() {
+                @Override
+                public <T> void onSuccess(ResponseInfo<T> responseInfo) {
+                    String jsonStr = responseInfo.result.toString();
+                    LogUtils.i(TAG, " album/findAll.do : " + jsonStr);
+                    PhotoAlbumManager.getInstance().clearPhotoAlbum();
+                    adapter.setData(PhotoAlbumManager.getInstance().parserAllAlbum(jsonStr));
+                    adapter.notifyDataSetChanged();
+                }
 
-            }
-        });
+                @Override
+                public void onFailure(HttpException error, String msg) {
+
+                }
+            });
+        }
+
     }
 }
