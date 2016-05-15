@@ -17,10 +17,13 @@ public abstract class NetWorkTask {
 
     private INetWorkListener netWorkListener;
     private HttpUtils httpUtils;
+//    private PreferencesCookieStore cookieStore;
 
     public void sendHttpRequest() {
         httpUtils = new HttpUtils();
         httpUtils.configCookieStore(MyCookieStore.cookieStore);
+//        cookieStore = new PreferencesCookieStore(MyApplication.getMyApplicationContext());
+//        httpUtils.configCookieStore(cookieStore);
         httpUtils.send(getHttpMethod(), getUrl(), getRequestParams(), getRequestCallBack());
     }
 

@@ -6,8 +6,8 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,7 +15,6 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.lidroid.xutils.exception.HttpException;
@@ -64,11 +63,12 @@ public class PhotoAlbumActivity extends BaseActivity {
     @Override
     protected void initViews() {
         photosView = (RecyclerView) findViewById(R.id.photos);
-        photosView.setLayoutManager(new StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL));
+        photosView.setLayoutManager(new GridLayoutManager(this, 4));
         SpacesItemDecoration decoration = new SpacesItemDecoration(16);
         photosView.addItemDecoration(decoration);
         adapter = new PhotoRVAdapter();
         photosView.setAdapter(adapter);
+
     }
 
     @Override
@@ -77,9 +77,9 @@ public class PhotoAlbumActivity extends BaseActivity {
         ImageView back = (ImageView) bottom.findViewById(R.id.back);
         ImageView add = (ImageView) bottom.findViewById(R.id.add);
         ImageView comment = (ImageView) bottom.findViewById(R.id.comment);
+        comment.setVisibility(View.GONE);
         back.setOnClickListener(getOnClickListener());
         add.setOnClickListener(getOnClickListener());
-        comment.setOnClickListener(getOnClickListener());
     }
 
     @Override
@@ -110,8 +110,6 @@ public class PhotoAlbumActivity extends BaseActivity {
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, final Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-
         if (requestCode == PhotoAlbumActivity.SYSTEM_GARRLY_REQUEST_CODE && resultCode == Activity.RESULT_OK && data != null) {
             MyConfirmDialog dialog = new MyConfirmDialog(PhotoAlbumActivity.this);
             dialog.setPositiveClickListener(new MyConfirmDialog.IMyClickListener() {
@@ -161,17 +159,11 @@ public class PhotoAlbumActivity extends BaseActivity {
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
-            case R.id.user_center:
-                Toast.makeText(this, "用户中心", Toast.LENGTH_SHORT).show();
-                break;
             case R.id.back:
                 finish();
                 break;
             case R.id.add:
                 addPhoto();
-                break;
-            case R.id.comment:
-                Toast.makeText(this, "添加对相册的评论", Toast.LENGTH_SHORT).show();
                 break;
             default:
                 break;
@@ -200,7 +192,7 @@ public class PhotoAlbumActivity extends BaseActivity {
         }
 
         @Override
-        public void onBindViewHolder(MyViewHolder holder, final int position) {
+        public void onBindViewHolder(final MyViewHolder holder, int position) {
             final Photo photo = PhotoAlbumManager.getInstance().getPhotos().get(position);
             if (!"null".equals(photo.getPhotoUrl())) {
                 Glide.with(PhotoAlbumActivity.this).load(NetWorkConfig.getHttpApiPath() + photo.getPhotoUrl()).into(holder.photoImage);
@@ -214,7 +206,7 @@ public class PhotoAlbumActivity extends BaseActivity {
                     Intent intent = new Intent(PhotoAlbumActivity.this, PhotoActivity.class);
                     Bundle data = new Bundle();
                     data.putParcelableArrayList("photoList", PhotoAlbumManager.getInstance().getPhotos());
-                    data.putInt("position", position);
+                    data.putInt("position", holder.getAdapterPosition());
                     intent.putExtra("data", data);
                     startActivity(intent);
                 }
@@ -224,8 +216,9 @@ public class PhotoAlbumActivity extends BaseActivity {
                 @Override
                 public boolean onLongClick(View v) {
                     MyLongPressDialog dialog = new MyLongPressDialog(PhotoAlbumActivity.this);
-                    dialog.setConfirmText(R.string.photoAlbum_set_cover);
-                    dialog.setPositiveClickListener(new MyLongPressDialog.IMyClickListener() {
+                    dialog.setDeleteVisisble();
+                    dialog.setCoverVisisble();
+                    dialog.setSetCoverClickListener(new MyLongPressDialog.IMyClickListener() {
                         @Override
                         public void onClick() {
                             PhotoAlbumManager.getInstance().setCoverRequest(String.valueOf(photo.getPhotoUrl()), albumId, new INetWorkListener() {
@@ -233,6 +226,27 @@ public class PhotoAlbumActivity extends BaseActivity {
                                 public <T> void onSuccess(ResponseInfo<T> responseInfo) {
                                     String jsonStr = responseInfo.result.toString();
                                     PhotoAlbumManager.getInstance().parseCoverUrl(jsonStr);
+                                }
+
+                                @Override
+                                public void onFailure(HttpException error, String msg) {
+
+                                }
+                            });
+                        }
+                    });
+                    dialog.setDeleteClickListener(new MyLongPressDialog.IMyClickListener() {
+                        @Override
+                        public void onClick() {
+                            PhotoAlbumManager.getInstance().deletePhotoRequest(String.valueOf(photo.getId()), String.valueOf(photo.getBelongId()), new INetWorkListener() {
+                                @Override
+                                public <T> void onSuccess(ResponseInfo<T> responseInfo) {
+                                    String jsonStr = responseInfo.result.toString();
+                                    if (PhotoAlbumManager.getInstance().parserDeleteAlbum(jsonStr) == 1) {
+                                        PhotoAlbumManager.getInstance().clearPhotoAlbum();
+                                        adapter.setData(PhotoAlbumManager.getInstance().parserAllDeletePhoto2(jsonStr));
+                                        adapter.notifyDataSetChanged();
+                                    }
                                 }
 
                                 @Override
@@ -283,6 +297,5 @@ public class PhotoAlbumActivity extends BaseActivity {
 
             }
         });
-
     }
 }

@@ -77,4 +77,18 @@
     <string name="delete_successfully">删除成功</string>
     <string name="delete_failure">删除失败</string>
 
+    <!--长按菜单-->
+    <string name="context_menu_set_cover">设置封面</string>
+    <string name="context_menu_delete">删除</string>
+
+    <!--投票-->
+    <string name="vote_tip">请投票,这张照片您想投几票?</string>
+
+    <!--修改信息-->
+    <string name="edit_nickname">请输入新账号名</string>
+    <string name="edit_password">请输入新密码</string>
+    <string name="edit_confirm_password">请再次输入新密码</string>
+    <string name="edit_tips">请确保两次密码输入一致</string>
+    <string name="edit_success">修改成功</string>
+    <string name="edit_failure">修改失败</string>
 </resources>

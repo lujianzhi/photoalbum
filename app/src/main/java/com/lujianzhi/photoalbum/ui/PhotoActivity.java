@@ -13,9 +13,8 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
+import android.widget.RatingBar;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.lidroid.xutils.exception.HttpException;
@@ -25,12 +24,12 @@ import com.lujianzhi.photoalbum.config.NetWorkConfig;
 import com.lujianzhi.photoalbum.entity.Comment;
 import com.lujianzhi.photoalbum.entity.Photo;
 import com.lujianzhi.photoalbum.net.PhotoAlbumManager;
-import com.lujianzhi.photoalbum.net.UserManager;
 import com.lujianzhi.photoalbum.net.networktask.INetWorkListener;
 import com.lujianzhi.photoalbum.ui.base.BaseActivity;
 import com.lujianzhi.photoalbum.ui.viewpager.HackyViewPager;
+import com.lujianzhi.photoalbum.utils.LogUtils;
 import com.lujianzhi.photoalbum.utils.ToastUtils;
-import com.lujianzhi.photoalbum.view.MyConfirmDialog;
+import com.lujianzhi.photoalbum.view.MyVoteDialog;
 import com.lujianzhi.photoalbum.view.photoview.PhotoView;
 
 import java.util.ArrayList;
@@ -40,12 +39,12 @@ import java.util.List;
  * Created by lujianzhi on 2016/1/22.
  */
 public class PhotoActivity extends BaseActivity {
+    private final String TAG = PhotoActivity.class.getCanonicalName();
 
     private List<Photo> photoList = new ArrayList<Photo>();
     private List<Comment> commentList = new ArrayList<>();
 
     private int photoPosition;
-    private TextView top_title;
     private HackyViewPager hackyViewPager;
     private ImageView commentImg;
     private LinearLayout comment_area;
@@ -61,14 +60,14 @@ public class PhotoActivity extends BaseActivity {
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
-            case R.id.user_center:
-                Toast.makeText(this, "用户中心", Toast.LENGTH_SHORT).show();
-                break;
             case R.id.back:
                 finish();
                 break;
             case R.id.comment:
                 showCommentArea();
+                break;
+            case R.id.vote:
+                showVoteArea();
                 break;
             default:
                 break;
@@ -77,14 +76,6 @@ public class PhotoActivity extends BaseActivity {
 
     @Override
     protected void initTopViews() {
-        RelativeLayout top = (RelativeLayout) findViewById(R.id.top);
-        ImageView back = (ImageView) top.findViewById(R.id.back);
-        top_title = (TextView) top.findViewById(R.id.top_title);
-        ImageView user_center = (ImageView) top.findViewById(R.id.user_center);
-
-        back.setVisibility(View.INVISIBLE);
-        top_title.setText(photoList.get(photoPosition).getName());
-        user_center.setOnClickListener(getOnClickListener());
     }
 
     @Override
@@ -124,6 +115,8 @@ public class PhotoActivity extends BaseActivity {
         bottom = (LinearLayout) findViewById(R.id.bottom);
         ImageView back = (ImageView) bottom.findViewById(R.id.back);
         ImageView add = (ImageView) bottom.findViewById(R.id.add);
+        ImageView vote = (ImageView) bottom.findViewById(R.id.vote);
+        vote.setVisibility(View.VISIBLE);
         add.setVisibility(View.GONE);
         commentImg = (ImageView) bottom.findViewById(R.id.comment);
         comment_area = (LinearLayout) bottom.findViewById(R.id.comment_area);
@@ -131,6 +124,7 @@ public class PhotoActivity extends BaseActivity {
         commit = (Button) bottom.findViewById(R.id.commit);
         back.setOnClickListener(getOnClickListener());
         commentImg.setOnClickListener(getOnClickListener());
+        vote.setOnClickListener(getOnClickListener());
 
         commentRecyclerView = (RecyclerView) bottom.findViewById(R.id.comment_list);
         commentAdapter = new MyCommentAdapter();
@@ -160,6 +154,37 @@ public class PhotoActivity extends BaseActivity {
     protected void initData() {
     }
 
+    private void showVoteArea() {
+        MyVoteDialog myVoteDialog = new MyVoteDialog(this);
+        final RatingBar ratingBar = myVoteDialog.getRatingBar();
+        ratingBar.setRating((float) photoList.get(photoPosition).getVote());
+        myVoteDialog.setPositiveClickListener(new MyVoteDialog.IMyClickListener() {
+            @Override
+            public void onClick() {
+                PhotoAlbumManager.getInstance().voteRequest(String.valueOf(photoList.get(photoPosition).getId()), String.valueOf(photoList.get(photoPosition).getBelongId()), String.valueOf(ratingBar.getRating()), new INetWorkListener() {
+                    @Override
+                    public <T> void onSuccess(ResponseInfo<T> responseInfo) {
+                        String jsonStr = responseInfo.result.toString();
+                        LogUtils.i(TAG, jsonStr);
+
+                        if (PhotoAlbumManager.getInstance().parserVote(jsonStr) == 1) {
+                            float newRate = PhotoAlbumManager.getInstance().parserVotePoint(jsonStr);
+                            photoList.get(photoPosition).setVote(newRate);
+                            ratingBar.setRating(newRate);
+                        } else {
+                            ToastUtils.showShortToast("投票失败");
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(HttpException error, String msg) {
+                    }
+                });
+            }
+        });
+        myVoteDialog.show();
+    }
+
     private void showCommentArea() {
         if (showComment) {
             comment_area.setVisibility(View.GONE);
@@ -178,7 +203,9 @@ public class PhotoActivity extends BaseActivity {
                         String jsonStr = responseInfo.result.toString();
                         if (PhotoAlbumManager.getInstance().parserComment(jsonStr) == 1) {
                             photoList.get(photoPosition).setComment(PhotoAlbumManager.getInstance().parserAllComment(jsonStr));
+                            commentList.addAll(0, PhotoAlbumManager.getInstance().parserAllComment(jsonStr));
                             commentAdapter.notifyDataSetChanged();
+                            comment_content.setText("");
                         } else {
                             ToastUtils.showShortToast(R.string.comment_failure);
                         }
@@ -248,40 +275,6 @@ public class PhotoActivity extends BaseActivity {
             holder.comment_user_name.setText(comment.getName());
             holder.comment_content.setText(comment.getContent());
             holder.comment_time.setText(comment.getDate());
-
-            holder.itemView.setOnLongClickListener(new View.OnLongClickListener() {
-                @Override
-                public boolean onLongClick(View v) {
-                    MyConfirmDialog dialog = new MyConfirmDialog(PhotoActivity.this);
-                    dialog.setConfirmText(R.string.delete_comment);
-                    dialog.setPositiveClickListener(new MyConfirmDialog.IMyClickListener() {
-                        @Override
-                        public void onClick() {
-                            if (comment.getName().equals(UserManager.getInstance().getUser().getUserName())) {
-                                PhotoAlbumManager.getInstance().deleteCommentRequest(comment.getId(), new INetWorkListener() {
-                                    @Override
-                                    public <T> void onSuccess(ResponseInfo<T> responseInfo) {
-                                        String jsonStr = responseInfo.result.toString();
-                                        if (PhotoAlbumManager.getInstance().parserDeleteComment(jsonStr) == 1) {
-                                            ToastUtils.showLongToast(R.string.delete_successfully);
-                                        } else {
-                                            ToastUtils.showLongToast(R.string.delete_failure);
-                                        }
-                                    }
-
-                                    @Override
-                                    public void onFailure(HttpException error, String msg) {
-
-                                    }
-                                });
-                            } else {
-                                ToastUtils.showLongToast(R.string.delete_other_people_comment);
-                            }
-                        }
-                    });
-                    return false;
-                }
-            });
 
         }
 

@@ -14,22 +14,30 @@
             android:id="@+id/back"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_weight="0.33"
+            android:layout_weight="0.25"
             android:src="@drawable/back"/>
 
         <ImageView
             android:id="@+id/add"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_weight="0.33"
+            android:layout_weight="0.25"
             android:src="@drawable/add"/>
 
         <ImageView
             android:id="@+id/comment"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_weight="0.34"
+            android:layout_weight="0.25"
             android:src="@drawable/comment"/>
+
+        <ImageView
+            android:id="@+id/vote"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.25"
+            android:src="@drawable/vote"
+            android:visibility="gone"/>
     </LinearLayout>
 
     <LinearLayout

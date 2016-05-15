@@ -21,6 +21,8 @@
     <dimen name="gap_70">70dp</dimen>
     <dimen name="gap_100">100dp</dimen>
     <dimen name="gap_125">125dp</dimen>
+    <dimen name="gap_180">180dp</dimen>
+    <dimen name="gap_200">200dp</dimen>
     <dimen name="gap_250">250dp</dimen>
 
     <dimen name="font_14">14sp</dimen>

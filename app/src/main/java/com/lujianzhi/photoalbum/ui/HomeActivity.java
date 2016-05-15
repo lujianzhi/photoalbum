@@ -5,8 +5,8 @@ import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -21,7 +21,6 @@ import com.lidroid.xutils.exception.HttpException;
 import com.lidroid.xutils.http.ResponseInfo;
 import com.lujianzhi.photoalbum.R;
 import com.lujianzhi.photoalbum.adapter.SpacesItemDecoration;
-import com.lujianzhi.photoalbum.config.NetWorkConfig;
 import com.lujianzhi.photoalbum.entity.PhotoAlbum;
 import com.lujianzhi.photoalbum.net.PhotoAlbumManager;
 import com.lujianzhi.photoalbum.net.networktask.INetWorkListener;
@@ -79,7 +78,7 @@ public class HomeActivity extends BaseActivity {
     @Override
     protected void initViews() {
         photoAlbumView = (RecyclerView) findViewById(R.id.photo_album);
-        photoAlbumView.setLayoutManager(new StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL));
+        photoAlbumView.setLayoutManager(new GridLayoutManager(this, 2));
         SpacesItemDecoration decoration = new SpacesItemDecoration(16);
         photoAlbumView.addItemDecoration(decoration);
         adapter = new PhotoAlbumRVAdapter();
@@ -174,9 +173,10 @@ public class HomeActivity extends BaseActivity {
         public void onBindViewHolder(MyViewHolder holder, int position) {
             final PhotoAlbum photoAlbum = PhotoAlbumManager.getInstance().getPhotoAlbums().get(position);
             if (!"null".equals(photoAlbum.getCoverUrl())) {
-                Glide.with(HomeActivity.this).load(NetWorkConfig.getHttpApiPath() + photoAlbum.getCoverUrl()).into(holder.albumCover);
+//                Glide.with(HomeActivity.this).load(NetWorkConfig.getHttpApiPath() + photoAlbum.getCoverUrl()).into(holder.albumCover);
+                Glide.with(HomeActivity.this).load(photoAlbum.getCoverUrl()).into(holder.albumCover);
             } else {
-                holder.albumCover.setImageResource(R.drawable.photo);
+                holder.albumCover.setImageResource(R.drawable.cover);
             }
             if (photoAlbum.getType() == 1) {
                 holder.albumName.setTextColor(Color.RED);
@@ -201,7 +201,8 @@ public class HomeActivity extends BaseActivity {
                 @Override
                 public boolean onLongClick(View v) {
                     MyLongPressDialog dialog = new MyLongPressDialog(HomeActivity.this);
-                    dialog.setPositiveClickListener(new MyLongPressDialog.IMyClickListener() {
+                    dialog.setDeleteVisisble();
+                    dialog.setDeleteClickListener(new MyLongPressDialog.IMyClickListener() {
                         @Override
                         public void onClick() {
                             PhotoAlbumManager.getInstance().deleteAlbumRequest(String.valueOf(photoAlbum.getId()), new INetWorkListener() {
@@ -259,7 +260,6 @@ public class HomeActivity extends BaseActivity {
                 PhotoAlbumManager.getInstance().clearPhotoAlbum();
                 adapter.setData(PhotoAlbumManager.getInstance().parserAllAlbum(jsonStr));
                 adapter.notifyDataSetChanged();
-
             }
 
             @Override

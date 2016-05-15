@@ -32,18 +32,14 @@ public class Photo implements Parcelable {
      */
     private int belongId;
 
-    public Photo(){
+    /**
+     * 投票分数
+     */
+    private double vote;
+
+    public Photo() {
 
     }
-
-    public Photo(int id, String name, String photoUrl, List<Comment> comment, int belongId) {
-        this.id = id;
-        this.name = name;
-        this.photoUrl = photoUrl;
-        this.comment = comment;
-        this.belongId = belongId;
-    }
-
 
     protected Photo(Parcel in) {
         id = in.readInt();
@@ -51,6 +47,22 @@ public class Photo implements Parcelable {
         photoUrl = in.readString();
         comment = in.createTypedArrayList(Comment.CREATOR);
         belongId = in.readInt();
+        vote = in.readDouble();
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeInt(id);
+        dest.writeString(name);
+        dest.writeString(photoUrl);
+        dest.writeTypedList(comment);
+        dest.writeInt(belongId);
+        dest.writeDouble(vote);
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
     }
 
     public static final Creator<Photo> CREATOR = new Creator<Photo>() {
@@ -105,17 +117,11 @@ public class Photo implements Parcelable {
         this.belongId = belongId;
     }
 
-    @Override
-    public int describeContents() {
-        return 0;
+    public double getVote() {
+        return vote;
     }
 
-    @Override
-    public void writeToParcel(Parcel dest, int flags) {
-        dest.writeInt(id);
-        dest.writeString(name);
-        dest.writeString(photoUrl);
-        dest.writeTypedList(comment);
-        dest.writeInt(belongId);
+    public void setVote(double vote) {
+        this.vote = vote;
     }
 }

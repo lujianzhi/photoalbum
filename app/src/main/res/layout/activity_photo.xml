@@ -4,14 +4,6 @@
                 android:layout_height="match_parent"
                 android:background="@color/color12">
 
-    <include
-        android:id="@+id/top"
-        layout="@layout/top_layout"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"/>
-
-
     <ScrollView
         android:id="@+id/bottom_scroll"
         android:layout_width="match_parent"

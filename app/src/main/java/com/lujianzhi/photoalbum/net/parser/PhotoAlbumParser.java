@@ -3,6 +3,7 @@ package com.lujianzhi.photoalbum.net.parser;
 import com.lujianzhi.photoalbum.entity.Comment;
 import com.lujianzhi.photoalbum.entity.Photo;
 import com.lujianzhi.photoalbum.entity.PhotoAlbum;
+import com.lujianzhi.photoalbum.utils.MyUtil;
 import com.lujianzhi.photoalbum.utils.ToastUtils;
 
 import org.json.JSONArray;
@@ -44,16 +45,65 @@ public class PhotoAlbumParser extends BaseParser {
         photoAlbums.clear();
     }
 
+    public int parserEditInfo(String jsonStr) {
+        return parseCode(jsonStr);
+    }
+
+    public List<Photo> parserAllDeletePhoto2(String jsonStr) {
+        photos.clear();
+        String json = parseMessage(jsonStr);
+        try {
+            JSONArray jsonArray = new JSONArray(json);
+            for (int i = 0; i < jsonArray.length(); i++) {
+                Photo photo = new Photo();
+                JSONObject photoObj = jsonArray.getJSONObject(i);
+                if (photoObj.has("comments") && !photoObj.isNull("comments")) {
+                    JSONArray commentArray = photoObj.getJSONArray("comments");
+                    ArrayList<Comment> comments = new ArrayList<>();
+                    for (int j = 0; j < commentArray.length(); j++) {
+                        JSONObject commentObj = commentArray.getJSONObject(j);
+                        if (commentObj != null) {
+                            Comment comment = new Comment();
+                            comment.setContent(commentObj.getString("content"));
+                            comment.setDate(MyUtil.getFormatDate(commentObj.getString("date")));
+                            comment.setId(commentObj.getInt("id"));
+                            comment.setName(commentObj.getString("userName"));
+                            comment.setPhotoId(commentObj.getInt("photoId"));
+                            comment.setUserId(commentObj.getInt("userId"));
+                            comments.add(comment);
+                        }
+                    }
+                    photo.setComment(comments);
+                }
+                photo.setId(Integer.valueOf(photoObj.getString("id")));
+                photo.setBelongId(Integer.valueOf(photoObj.getString("belongId")));
+                photo.setName(photoObj.getString("name"));
+                photo.setPhotoUrl(photoObj.getString("photoUrl"));
+                if (photoObj.has("vote")) {
+                    photo.setVote(photoObj.getDouble("vote"));
+                }
+                photos.add(photo);
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return photos;
+    }
+
+    public float parserVotePoint(String jsonStr) {
+        return Float.valueOf(parseMessage(jsonStr));
+    }
+
+    public int parserVote(String jsonStr) {
+        return parseCode(jsonStr);
+    }
+
     public int parserComment(String jsonStr) {
         return parseCode(jsonStr);
     }
 
     public int parserCoverUrl(String jsonStr) {
         parseMessage(jsonStr);
-        return parseCode(jsonStr);
-    }
-
-    public int parserDeleteComment(String jsonStr) {
         return parseCode(jsonStr);
     }
 
@@ -64,12 +114,13 @@ public class PhotoAlbumParser extends BaseParser {
             JSONArray jsonArray = new JSONArray(json);
             for (int i = 0; i < jsonArray.length(); i++) {
                 Comment comment = new Comment();
-                JSONObject photoObj = jsonArray.getJSONObject(i);
-                comment.setName(photoObj.getString("name"));
-                comment.setUserId(photoObj.getInt("userId"));
-                comment.setPhotoId(photoObj.getInt("photoId"));
-                comment.setContent(photoObj.getString("content"));
-                comment.setId(photoObj.getInt("id"));
+                JSONObject commentObj = jsonArray.getJSONObject(i);
+                comment.setName(commentObj.getString("userName"));
+                comment.setUserId(commentObj.getInt("userId"));
+                comment.setPhotoId(commentObj.getInt("photoId"));
+                comment.setContent(commentObj.getString("content"));
+                comment.setDate(MyUtil.getFormatDate(commentObj.getString("date")));
+                comment.setId(commentObj.getInt("id"));
                 comments.add(comment);
             }
         } catch (JSONException e) {
@@ -107,22 +158,24 @@ public class PhotoAlbumParser extends BaseParser {
         try {
             JSONArray jsonArray = new JSONArray(json);
             JSONObject photoObj = jsonArray.getJSONObject(0);
-            JSONArray commentArray = photoObj.getJSONArray("comments");
-            ArrayList<Comment> comments = new ArrayList<>();
-            for (int i = 0; i < commentArray.length(); i++) {
-                JSONObject commentObj = commentArray.getJSONObject(i);
-                if (commentObj != null) {
-                    Comment comment = new Comment();
-                    comment.setContent(commentObj.getString("content"));
-                    comment.setDate(commentObj.getString("date"));
-                    comment.setId(commentObj.getInt("id"));
-                    comment.setName(commentObj.getString("name"));
-                    comment.setPhotoId(commentObj.getInt("photoId"));
-                    comment.setUserId(commentObj.getInt("userId"));
-                    comments.add(comment);
+            if (photoObj.has("comments") && !photoObj.isNull("comments")) {
+                JSONArray commentArray = photoObj.getJSONArray("comments");
+                ArrayList<Comment> comments = new ArrayList<>();
+                for (int i = 0; i < commentArray.length(); i++) {
+                    JSONObject commentObj = commentArray.getJSONObject(i);
+                    if (commentObj != null) {
+                        Comment comment = new Comment();
+                        comment.setContent(commentObj.getString("content"));
+                        comment.setDate(MyUtil.getFormatDate(commentObj.getString("date")));
+                        comment.setId(commentObj.getInt("id"));
+                        comment.setName(commentObj.getString("userName"));
+                        comment.setPhotoId(commentObj.getInt("photoId"));
+                        comment.setUserId(commentObj.getInt("userId"));
+                        comments.add(comment);
+                    }
                 }
+                photo.setComment(comments);
             }
-            photo.setComment(comments);
             photo.setPhotoUrl(photoObj.getString("photoUrl"));
         } catch (JSONException e) {
             e.printStackTrace();
@@ -138,23 +191,31 @@ public class PhotoAlbumParser extends BaseParser {
             for (int i = 0; i < jsonArray.length(); i++) {
                 Photo photo = new Photo();
                 JSONObject photoObj = jsonArray.getJSONObject(i);
-                JSONArray commentArray = photoObj.getJSONArray("comments");
-                ArrayList<Comment> comments = new ArrayList<>();
-                for (int j = 0; j < commentArray.length(); j++) {
-                    JSONObject commentObj = commentArray.getJSONObject(j);
-                    if (commentObj != null) {
-                        Comment comment = new Comment();
-                        comment.setContent(commentObj.getString("content"));
-                        comment.setDate(commentObj.getString("date"));
-                        comment.setId(commentObj.getInt("id"));
-                        comment.setName(commentObj.getString("name"));
-                        comment.setPhotoId(commentObj.getInt("photoId"));
-                        comment.setUserId(commentObj.getInt("userId"));
-                        comments.add(comment);
+                if (photoObj.has("comments") && !photoObj.isNull("comments")) {
+                    JSONArray commentArray = photoObj.getJSONArray("comments");
+                    ArrayList<Comment> comments = new ArrayList<>();
+                    for (int j = 0; j < commentArray.length(); j++) {
+                        JSONObject commentObj = commentArray.getJSONObject(j);
+                        if (commentObj != null) {
+                            Comment comment = new Comment();
+                            comment.setContent(commentObj.getString("content"));
+                            comment.setDate(MyUtil.getFormatDate(commentObj.getString("date")));
+                            comment.setId(commentObj.getInt("id"));
+                            comment.setName(commentObj.getString("userName"));
+                            comment.setPhotoId(commentObj.getInt("photoId"));
+                            comment.setUserId(commentObj.getInt("userId"));
+                            comments.add(comment);
+                        }
                     }
+                    photo.setComment(comments);
                 }
-                photo.setComment(comments);
+                photo.setId(Integer.valueOf(photoObj.getString("id")));
+                photo.setBelongId(Integer.valueOf(photoObj.getString("belongId")));
+                photo.setName(photoObj.getString("name"));
                 photo.setPhotoUrl(photoObj.getString("photoUrl"));
+                if (photoObj.has("vote")) {
+                    photo.setVote(photoObj.getDouble("vote"));
+                }
                 photos.add(photo);
             }
         } catch (JSONException e) {

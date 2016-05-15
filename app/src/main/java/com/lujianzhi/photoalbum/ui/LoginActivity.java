@@ -85,6 +85,29 @@ public class LoginActivity extends BaseActivity {
         user.setPassword(userPassword.getText().toString());
         user.setUserName(userName.getText().toString());
 
+//        PhotoAlbumManager.getInstance().loginRequest(user.getUserName(), user.getPassword(), new INetWorkListener() {
+//            @Override
+//            public <T> void onSuccess(ResponseInfo<T> responseInfo) {
+//                String respondStr = responseInfo.result.toString();
+//                LogUtils.i(TAG, respondStr);
+//
+//                if (PhotoAlbumManager.getInstance().parserLogin(respondStr) == 1) {
+//                    Intent intent = new Intent(LoginActivity.this, HomeActivity.class);
+//                    startActivity(intent);
+//                    LoginActivity.loginState = true;
+//                    SharedPreferencesUtils.recordLoginState(LoginActivity.this, LoginActivity.loginState);
+//                    finish();
+//                }
+//            }
+//
+//            @Override
+//            public void onFailure(HttpException error, String msg) {
+//                LoginActivity.loginState = false;
+//                SharedPreferencesUtils.recordLoginState(LoginActivity.this, LoginActivity.loginState);
+//                ToastUtils.showShortToast(R.string.net_request_failure);
+//            }
+//        });
+
         final HttpUtils httpUtils = new HttpUtils(5000);
         RequestParams params = new RequestParams();
         params.addBodyParameter("userName", user.getUserName());

@@ -1,72 +1,71 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="@dimen/gap_30"
-                android:layout_marginRight="@dimen/gap_30"
-                android:background="@drawable/dialog_round_corner"
-                android:gravity="center"
-                android:paddingTop="@dimen/gap_10">
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:layout_width="match_parent"
+              android:layout_height="wrap_content"
+              android:background="@drawable/dialog_round_corner"
+              android:orientation="vertical">
 
-    <LinearLayout
-        android:id="@+id/album_public_area"
+    <TextView
+        android:id="@+id/delete"
         android:layout_width="match_parent"
-        android:layout_height="@dimen/gap_30"
-        android:layout_below="@id/album_name_area"
-        android:layout_marginLeft="@dimen/gap_10"
-        android:layout_marginRight="@dimen/gap_10"
-        android:layout_marginTop="@dimen/gap_10"
-        android:gravity="center"
-        android:orientation="horizontal">
+        android:layout_height="wrap_content"
+        android:paddingBottom="@dimen/gap_10"
+        android:paddingLeft="@dimen/gap_30"
+        android:paddingRight="@dimen/gap_30"
+        android:paddingTop="@dimen/gap_10"
+        android:text="@string/context_menu_delete"
+        android:textSize="@dimen/font_20"/>
 
-        <TextView
-            android:id="@+id/confirm_text"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/delete_photo_album"
-            android:textSize="@dimen/font_20"/>
-
-    </LinearLayout>
-
-    <View
-        android:id="@+id/divider"
+    <TextView
+        android:id="@+id/set_cover"
         android:layout_width="match_parent"
-        android:layout_height="@dimen/px_1"
-        android:layout_below="@id/album_public_area"
-        android:layout_marginTop="@dimen/gap_10"
-        android:background="@color/color10"/>
+        android:layout_height="wrap_content"
+        android:paddingBottom="@dimen/gap_10"
+        android:paddingLeft="@dimen/gap_30"
+        android:paddingRight="@dimen/gap_30"
+        android:paddingTop="@dimen/gap_10"
+        android:text="@string/context_menu_set_cover"
+        android:textSize="@dimen/font_20"/>
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="@dimen/gap_40"
-        android:layout_below="@id/divider">
+    <!--<View-->
+    <!--android:id="@+id/divider"-->
+    <!--android:layout_width="match_parent"-->
+    <!--android:layout_height="@dimen/px_1"-->
+    <!--android:layout_below="@id/album_public_area"-->
+    <!--android:layout_marginTop="@dimen/gap_10"-->
+    <!--android:background="@color/color10"/>-->
 
-        <TextView
-            android:id="@+id/confirm"
-            android:layout_width="@dimen/gap_0"
-            android:layout_height="@dimen/gap_30"
-            android:layout_marginTop="@dimen/gap_5"
-            android:layout_weight="1"
-            android:gravity="center"
-            android:text="@string/confirm"
-            android:textColor="@color/color22"
-            android:textSize="@dimen/font_17"/>
+    <!--<LinearLayout-->
+    <!--android:layout_width="match_parent"-->
+    <!--android:layout_height="@dimen/gap_40"-->
+    <!--android:layout_below="@id/divider">-->
 
-        <View
-            android:layout_width="@dimen/px_1"
-            android:layout_height="match_parent"
-            android:background="@color/color10"/>
+    <!--<TextView-->
+    <!--android:id="@+id/confirm"-->
+    <!--android:layout_width="@dimen/gap_0"-->
+    <!--android:layout_height="@dimen/gap_30"-->
+    <!--android:layout_marginTop="@dimen/gap_5"-->
+    <!--android:layout_weight="1"-->
+    <!--android:gravity="center"-->
+    <!--android:text="@string/confirm"-->
+    <!--android:textColor="@color/color22"-->
+    <!--android:textSize="@dimen/font_17"/>-->
 
-        <TextView
-            android:id="@+id/cancel"
-            android:layout_width="@dimen/gap_0"
-            android:layout_height="@dimen/gap_30"
-            android:layout_marginTop="@dimen/gap_5"
-            android:layout_weight="1"
-            android:gravity="center"
-            android:text="@string/cancel"
-            android:textColor="@color/color22"
-            android:textSize="@dimen/font_17"/>
-    </LinearLayout>
+    <!--<View-->
+    <!--android:layout_width="@dimen/px_1"-->
+    <!--android:layout_height="match_parent"-->
+    <!--android:background="@color/color10"/>-->
 
-</RelativeLayout>
+    <!--<TextView-->
+    <!--android:id="@+id/cancel"-->
+    <!--android:layout_width="@dimen/gap_0"-->
+    <!--android:layout_height="@dimen/gap_30"-->
+    <!--android:layout_marginTop="@dimen/gap_5"-->
+    <!--android:layout_weight="1"-->
+    <!--android:gravity="center"-->
+    <!--android:text="@string/cancel"-->
+    <!--android:textColor="@color/color22"-->
+    <!--android:textSize="@dimen/font_17"/>-->
+    <!--</LinearLayout>-->
+
+</LinearLayout>

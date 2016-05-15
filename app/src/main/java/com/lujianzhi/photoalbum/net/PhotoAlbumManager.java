@@ -36,14 +36,6 @@ public class PhotoAlbumManager {
         return instance;
     }
 
-    public int parserDeleteComment(String jsonStr) {
-        return photoAlbumParser.parserDeleteComment(jsonStr);
-    }
-
-    public void deleteCommentRequest(int commentId, INetWorkListener netWorkListener) {
-        photoAlbumNetWork.deleteCommentRequest(commentId, netWorkListener);
-    }
-
     public ArrayList<PhotoAlbum> getPhotoAlbums() {
         return photoAlbumParser.getPhotoAlbums();
     }
@@ -60,12 +52,44 @@ public class PhotoAlbumManager {
         photoAlbumParser.setPhotos(photos);
     }
 
+    public void setComments(ArrayList<Comment> photos) {
+
+    }
+
     public void clearPhoto() {
         photoAlbumParser.clearPhoto();
     }
 
     public void clearPhotoAlbum() {
         photoAlbumParser.clearPhotoAlbum();
+    }
+
+    public int parserEditInfo(String jsonStr) {
+        return photoAlbumParser.parserEditInfo(jsonStr);
+    }
+
+    public void editInfoRequest(final String userName, final String password, INetWorkListener netWorkListener) {
+        photoAlbumNetWork.editInfoRequest(userName, password, netWorkListener);
+    }
+
+    public List<Photo> parserAllDeletePhoto2(String jsonStr) {
+        return photoAlbumParser.parserAllDeletePhoto2(jsonStr);
+    }
+
+    public void deletePhotoRequest(String id, String belongId, INetWorkListener netWorkListener) {
+        photoAlbumNetWork.deletePhotoRequest(id, belongId, netWorkListener);
+    }
+
+    public float parserVotePoint(String jsonStr) {
+        return photoAlbumParser.parserVotePoint(jsonStr);
+    }
+
+    public int parserVote(String jsonStr) {
+        return photoAlbumParser.parserVote(jsonStr);
+    }
+
+    public void voteRequest(final String photoId, final String belongId, final String vote, INetWorkListener netWorkListener) {
+        photoAlbumNetWork.voteRequest(photoId, belongId, vote, netWorkListener);
     }
 
     public List<Comment> parserAllComment(String jsonStr) {

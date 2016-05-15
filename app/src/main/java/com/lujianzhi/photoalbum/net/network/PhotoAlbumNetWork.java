@@ -1,7 +1,5 @@
 package com.lujianzhi.photoalbum.net.network;
 
-import android.content.Context;
-
 import com.lidroid.xutils.http.RequestParams;
 import com.lidroid.xutils.http.client.HttpRequest;
 import com.lujianzhi.photoalbum.config.NetWorkConfig;
@@ -14,6 +12,78 @@ import java.io.File;
  * Created by lujianzhi on 2016/1/21.
  */
 public class PhotoAlbumNetWork {
+
+    public void editInfoRequest(final String userName, final String password, INetWorkListener netWorkListener) {
+        NetWorkTask netWorkTask = new NetWorkTask() {
+            @Override
+            public HttpRequest.HttpMethod getHttpMethod() {
+                return HttpRequest.HttpMethod.POST;
+            }
+
+            @Override
+            public String getUrl() {
+                return NetWorkConfig.getHttpApiPath() + "/register/edit.do";
+            }
+
+            @Override
+            public RequestParams getRequestParams() {
+                RequestParams params = new RequestParams();
+                params.addBodyParameter("userName", userName);
+                params.addBodyParameter("password", password);
+                return params;
+            }
+        };
+        netWorkTask.setNetWorkListener(netWorkListener);
+        netWorkTask.sendHttpRequest();
+    }
+
+    public void deletePhotoRequest(final String id, final String belongId, INetWorkListener netWorkListener) {
+        NetWorkTask netWorkTask = new NetWorkTask() {
+            @Override
+            public HttpRequest.HttpMethod getHttpMethod() {
+                return HttpRequest.HttpMethod.POST;
+            }
+
+            @Override
+            public String getUrl() {
+                return NetWorkConfig.getHttpApiPath() + "/photo/delete.do";
+            }
+
+            @Override
+            public RequestParams getRequestParams() {
+                RequestParams params = new RequestParams();
+                params.addBodyParameter("id", id);
+                params.addBodyParameter("belongId", belongId);
+                return params;
+            }
+        };
+        netWorkTask.setNetWorkListener(netWorkListener);
+        netWorkTask.sendHttpRequest();
+    }
+
+    public void voteRequest(final String photoId, final String belongId, final String vote, INetWorkListener netWorkListener) {
+        NetWorkTask netWorkTask = new NetWorkTask() {
+            @Override
+            public HttpRequest.HttpMethod getHttpMethod() {
+                return HttpRequest.HttpMethod.POST;
+            }
+
+            @Override
+            public String getUrl() {
+                return NetWorkConfig.getHttpApiPath() + "/vote/vote.do";
+            }
+
+            @Override
+            public RequestParams getRequestParams() {
+                RequestParams params = new RequestParams();
+                params.addBodyParameter("photoId", photoId);
+                params.addBodyParameter("voteValue", vote);
+                return params;
+            }
+        };
+        netWorkTask.setNetWorkListener(netWorkListener);
+        netWorkTask.sendHttpRequest();
+    }
 
     public void deleteCommentRequest(final int commentId, INetWorkListener netWorkListener) {
         NetWorkTask netWorkTask = new NetWorkTask() {
@@ -250,10 +320,6 @@ public class PhotoAlbumNetWork {
         };
         netWorkTask.setNetWorkListener(netWorkListener);
         netWorkTask.sendHttpRequest();
-    }
-
-    private String getText(Context context, int strId) {
-        return context.getResources().getText(strId).toString();
     }
 
 }

@@ -13,6 +13,7 @@ import com.lujianzhi.photoalbum.entity.User;
 import com.lujianzhi.photoalbum.net.UserManager;
 import com.lujianzhi.photoalbum.ui.base.BaseActivity;
 import com.lujianzhi.photoalbum.utils.SharedPreferencesUtils;
+import com.lujianzhi.photoalbum.view.MyEditDialog;
 import com.lujianzhi.photoalbum.view.RoundImageView;
 
 /**
@@ -78,7 +79,7 @@ public class UserCenterActivity extends BaseActivity {
                 finish();
                 break;
             case R.id.edit_area:
-
+                showEditDialog();
                 break;
             case R.id.logout_area:
                 //TODO 退出登录时需要将session清除
@@ -86,5 +87,16 @@ public class UserCenterActivity extends BaseActivity {
                 startActivity(new Intent(this, LoginActivity.class));
                 break;
         }
+    }
+
+    private void showEditDialog() {
+        MyEditDialog myEditDialog = new MyEditDialog(this);
+        myEditDialog.setComfirmListener(new MyEditDialog.IMyClickListener() {
+            @Override
+            public void onClick() {
+                nickName.setText(user.getUserName());
+            }
+        });
+        myEditDialog.show();
     }
 }
