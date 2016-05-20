@@ -9,7 +9,7 @@
         android:id="@+id/cover"
         android:layout_width="@dimen/gap_180"
         android:layout_height="@dimen/gap_180"
-        android:src="@drawable/cover"/>
+        android:src="@drawable/default_photo"/>
 
     <TextView
         android:id="@+id/name"

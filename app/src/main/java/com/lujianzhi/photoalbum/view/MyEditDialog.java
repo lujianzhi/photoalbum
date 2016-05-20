@@ -13,7 +13,6 @@ import com.lujianzhi.photoalbum.entity.User;
 import com.lujianzhi.photoalbum.net.PhotoAlbumManager;
 import com.lujianzhi.photoalbum.net.UserManager;
 import com.lujianzhi.photoalbum.net.networktask.INetWorkListener;
-import com.lujianzhi.photoalbum.utils.LogUtils;
 import com.lujianzhi.photoalbum.utils.ToastUtils;
 
 /**
@@ -27,9 +26,10 @@ public class MyEditDialog extends Dialog {
     private TextView negative;
     private TextView positive;
     private EditText userName;
+    private EditText oldPassword;
     private EditText password;
     private EditText passwordConfirm;
-    private String userNameStr;
+    private String oldPasswordStr;
     private String passwordStr;
     private String passwordConfirmStr;
     private User user;
@@ -49,12 +49,13 @@ public class MyEditDialog extends Dialog {
         positive = (TextView) popView.findViewById(R.id.regist);
         negative = (TextView) popView.findViewById(R.id.cancel);
         userName = (EditText) popView.findViewById(R.id.username);
+        oldPassword = (EditText) popView.findViewById(R.id.old_password);
         password = (EditText) popView.findViewById(R.id.password);
-        passwordConfirm = (EditText) popView.findViewById(R.id.password);
+        passwordConfirm = (EditText) popView.findViewById(R.id.password_confirm);
     }
 
     private void getRegisterData() {
-        userNameStr = userName.getText().toString();
+        oldPasswordStr = oldPassword.getText().toString();
         passwordStr = password.getText().toString();
         passwordConfirmStr = passwordConfirm.getText().toString();
     }
@@ -66,19 +67,15 @@ public class MyEditDialog extends Dialog {
             public void onClick(View v) {
                 getRegisterData();
                 if (passwordStr.equals(passwordConfirmStr)) {
-                    PhotoAlbumManager.getInstance().editInfoRequest(userNameStr, passwordConfirmStr, new INetWorkListener() {
+                    PhotoAlbumManager.getInstance().editInfoRequest(oldPasswordStr, passwordConfirmStr, new INetWorkListener() {
                         @Override
                         public <T> void onSuccess(ResponseInfo<T> responseInfo) {
                             String jsonStr = responseInfo.result.toString();
-                            LogUtils.i(TAG, jsonStr);
 
                             if (PhotoAlbumManager.getInstance().parserEditInfo(jsonStr) == 1) {
                                 user = UserManager.getInstance().getUser();
                                 user.setPassword(passwordConfirmStr);
-                                user.setUserName(userNameStr);
-                                ToastUtils.showShortToast(R.string.edit_success);
-                            } else {
-                                ToastUtils.showShortToast(R.string.edit_failure);
+                                dismiss();
                             }
                         }
 
@@ -103,7 +100,7 @@ public class MyEditDialog extends Dialog {
 
     }
 
-    public void setComfirmListener(IMyClickListener myClickListener) {
+    public void setConfirmListener(IMyClickListener myClickListener) {
         this.myClickListener = myClickListener;
     }
 

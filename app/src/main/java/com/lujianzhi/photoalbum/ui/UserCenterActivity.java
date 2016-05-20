@@ -7,14 +7,12 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import com.bumptech.glide.Glide;
 import com.lujianzhi.photoalbum.R;
 import com.lujianzhi.photoalbum.entity.User;
 import com.lujianzhi.photoalbum.net.UserManager;
 import com.lujianzhi.photoalbum.ui.base.BaseActivity;
 import com.lujianzhi.photoalbum.utils.SharedPreferencesUtils;
 import com.lujianzhi.photoalbum.view.MyEditDialog;
-import com.lujianzhi.photoalbum.view.RoundImageView;
 
 /**
  * Created by lujianzhi on 2016/1/29.
@@ -23,7 +21,6 @@ public class UserCenterActivity extends BaseActivity {
 
     private TextView nickName;
     private TextView phoneNumber;
-    private RoundImageView userPortrait;
     private User user;
 
     @Override
@@ -39,16 +36,9 @@ public class UserCenterActivity extends BaseActivity {
     protected void initViews() {
         nickName = (TextView) findViewById(R.id.nick_name);
         phoneNumber = (TextView) findViewById(R.id.userName);
-        userPortrait = (RoundImageView) findViewById(R.id.user_portrait);
 
         user = UserManager.getInstance().getUser();
         nickName.setText(user.getUserName());
-
-        if ("null".equals(user.getUserUrl()) || "".equals(user.getUserUrl()) || user.getUserUrl() == null) {
-            userPortrait.setImageResource(R.drawable.photo);
-        } else {
-            Glide.with(UserCenterActivity.this).load(user.getUserUrl()).into(userPortrait);
-        }
 
         LinearLayout edit_area = (LinearLayout) findViewById(R.id.edit_area);
         LinearLayout logout_area = (LinearLayout) findViewById(R.id.logout_area);
@@ -90,6 +80,9 @@ public class UserCenterActivity extends BaseActivity {
                 //TODO 退出登录时需要将session清除
                 SharedPreferencesUtils.recordLoginState(this, false);
                 startActivity(new Intent(this, LoginActivity.class));
+                Intent intent = new Intent("com.lujianzhi.photoalbum.service.MusicService");
+                intent.setPackage(getPackageName());
+                stopService(intent);
                 break;
         }
     }
@@ -100,7 +93,7 @@ public class UserCenterActivity extends BaseActivity {
 
     private void showEditDialog() {
         MyEditDialog myEditDialog = new MyEditDialog(this);
-        myEditDialog.setComfirmListener(new MyEditDialog.IMyClickListener() {
+        myEditDialog.setConfirmListener(new MyEditDialog.IMyClickListener() {
             @Override
             public void onClick() {
                 nickName.setText(user.getUserName());
@@ -108,4 +101,5 @@ public class UserCenterActivity extends BaseActivity {
         });
         myEditDialog.show();
     }
+
 }

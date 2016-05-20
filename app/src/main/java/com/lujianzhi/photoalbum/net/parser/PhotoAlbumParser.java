@@ -46,6 +46,7 @@ public class PhotoAlbumParser extends BaseParser {
     }
 
     public int parserEditInfo(String jsonStr) {
+        ToastUtils.showShortToast(parseMessage(jsonStr));
         return parseCode(jsonStr);
     }
 
@@ -79,9 +80,7 @@ public class PhotoAlbumParser extends BaseParser {
                 photo.setBelongId(Integer.valueOf(photoObj.getString("belongId")));
                 photo.setName(photoObj.getString("name"));
                 photo.setPhotoUrl(photoObj.getString("photoUrl"));
-                if (photoObj.has("vote")) {
-                    photo.setVote(photoObj.getDouble("vote"));
-                }
+                photo.setVote(photoObj.isNull("voteValue") ? 0.0 : photoObj.getDouble("voteValue"));
                 photos.add(photo);
             }
         } catch (JSONException e) {
@@ -213,9 +212,7 @@ public class PhotoAlbumParser extends BaseParser {
                 photo.setBelongId(Integer.valueOf(photoObj.getString("belongId")));
                 photo.setName(photoObj.getString("name"));
                 photo.setPhotoUrl(photoObj.getString("photoUrl"));
-                if (photoObj.has("vote")) {
-                    photo.setVote(photoObj.getDouble("vote"));
-                }
+                photo.setVote(photoObj.isNull("voteValue") ? 0.0 : photoObj.getDouble("voteValue"));
                 photos.add(photo);
             }
         } catch (JSONException e) {

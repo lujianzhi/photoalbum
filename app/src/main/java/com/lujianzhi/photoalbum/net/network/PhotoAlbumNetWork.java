@@ -13,7 +13,7 @@ import java.io.File;
  */
 public class PhotoAlbumNetWork {
 
-    public void editInfoRequest(final String userName, final String password, INetWorkListener netWorkListener) {
+    public void editInfoRequest(final String oldPassword, final String password, INetWorkListener netWorkListener) {
         NetWorkTask netWorkTask = new NetWorkTask() {
             @Override
             public HttpRequest.HttpMethod getHttpMethod() {
@@ -22,14 +22,14 @@ public class PhotoAlbumNetWork {
 
             @Override
             public String getUrl() {
-                return NetWorkConfig.getHttpApiPath() + "/register/edit.do";
+                return NetWorkConfig.getHttpApiPath() + "/user/updatePassword.do";
             }
 
             @Override
             public RequestParams getRequestParams() {
                 RequestParams params = new RequestParams();
-                params.addBodyParameter("userName", userName);
-                params.addBodyParameter("password", password);
+                params.addBodyParameter("oldPassword", oldPassword);
+                params.addBodyParameter("newPassword", password);
                 return params;
             }
         };
@@ -195,7 +195,6 @@ public class PhotoAlbumNetWork {
             public RequestParams getRequestParams() {
                 RequestParams requestParams = new RequestParams();
                 requestParams.addHeader("enctype", "multipart/form-data");
-                //TODO 多照片上传
                 requestParams.addBodyParameter("belongId", belongId);
                 requestParams.addBodyParameter("file", file);
                 requestParams.addBodyParameter("name", photoName);
@@ -229,7 +228,7 @@ public class PhotoAlbumNetWork {
         netWorkTask.sendHttpRequest();
     }
 
-    public void getUserAlbumsRequest(INetWorkListener netWorkListener) {
+    public void getFindAllUserAlbum(INetWorkListener netWorkListener) {
         NetWorkTask netWorkTask = new NetWorkTask() {
             @Override
             public HttpRequest.HttpMethod getHttpMethod() {
@@ -238,7 +237,7 @@ public class PhotoAlbumNetWork {
 
             @Override
             public String getUrl() {
-                return NetWorkConfig.getHttpApiPath() + "/album/findUserAll.do";
+                return NetWorkConfig.getHttpApiPath() + "/album/findAllUserAlbum.do";
             }
 
             @Override

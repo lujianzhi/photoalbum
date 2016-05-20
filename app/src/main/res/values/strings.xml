@@ -11,6 +11,8 @@
     <string name="account">账号</string>
     <string name="nickname">昵称</string>
     <string name="password">密码</string>
+    <string name="old_password">旧密码</string>
+    <string name="new_password">新密码</string>
     <string name="input_account">请输入账户</string>
     <string name="input_nickname">请输入昵称</string>
     <string name="input_password">请输入密码</string>
@@ -87,6 +89,7 @@
 
     <!--修改信息-->
     <string name="edit_nickname">请输入新账号名</string>
+    <string name="edit_old_password">请输入旧密码</string>
     <string name="edit_password">请输入新密码</string>
     <string name="edit_confirm_password">请再次输入新密码</string>
     <string name="edit_tips">请确保两次密码输入一致</string>

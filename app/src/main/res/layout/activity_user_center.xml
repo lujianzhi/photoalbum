@@ -20,13 +20,6 @@
         android:orientation="horizontal"
         android:padding="@dimen/gap_10">
 
-        <com.lujianzhi.photoalbum.view.RoundImageView
-            android:id="@+id/user_portrait"
-            android:layout_width="@dimen/gap_70"
-            android:layout_height="@dimen/gap_70"
-            android:src="@drawable/photo"/>
-
-
         <TextView
             android:id="@+id/nick_name"
             android:layout_width="wrap_content"

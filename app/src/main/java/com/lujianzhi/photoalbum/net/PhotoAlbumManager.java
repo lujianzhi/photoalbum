@@ -64,8 +64,8 @@ public class PhotoAlbumManager {
         return photoAlbumParser.parserEditInfo(jsonStr);
     }
 
-    public void editInfoRequest(final String userName, final String password, INetWorkListener netWorkListener) {
-        photoAlbumNetWork.editInfoRequest(userName, password, netWorkListener);
+    public void editInfoRequest(final String oldPassword, final String password, INetWorkListener netWorkListener) {
+        photoAlbumNetWork.editInfoRequest(oldPassword, password, netWorkListener);
     }
 
     public List<Photo> parserAllDeletePhoto2(String jsonStr) {
@@ -148,8 +148,8 @@ public class PhotoAlbumManager {
         return photoAlbumParser.parserAllAlbum(jsonStr);
     }
 
-    public void getUserAlbumsRequest(INetWorkListener netWorkListener) {
-        photoAlbumNetWork.getUserAlbumsRequest(netWorkListener);
+    public void getFindAllUserAlbum(INetWorkListener netWorkListener) {
+        photoAlbumNetWork.getFindAllUserAlbum(netWorkListener);
     }
 
     public void getAlbumsRequest(INetWorkListener netWorkListener) {

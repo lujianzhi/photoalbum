@@ -20,16 +20,17 @@
             android:layout_width="wrap_content"
             android:layout_height="@dimen/gap_30"
             android:gravity="center"
-            android:text="@string/account"
+            android:text="@string/old_password"
             android:textSize="@dimen/font_17"/>
 
         <EditText
-            android:id="@+id/username"
+            android:id="@+id/old_password"
             android:layout_width="match_parent"
             android:layout_height="@dimen/gap_30"
             android:layout_marginLeft="@dimen/gap_20"
             android:background="@null"
-            android:hint="@string/edit_nickname"
+            android:hint="@string/edit_old_password"
+            android:inputType="textPassword"
             android:textSize="@dimen/font_15"/>
 
     </LinearLayout>
@@ -48,7 +49,7 @@
             android:layout_width="wrap_content"
             android:layout_height="@dimen/gap_30"
             android:gravity="center"
-            android:text="@string/password"
+            android:text="@string/new_password"
             android:textSize="@dimen/font_17"/>
 
         <EditText
@@ -58,6 +59,7 @@
             android:layout_marginLeft="@dimen/gap_20"
             android:background="@null"
             android:hint="@string/edit_password"
+            android:inputType="textPassword"
             android:textSize="@dimen/font_15"/>
 
     </LinearLayout>
@@ -76,7 +78,7 @@
             android:layout_width="wrap_content"
             android:layout_height="@dimen/gap_30"
             android:gravity="center"
-            android:text="@string/password"
+            android:text="@string/new_password"
             android:textSize="@dimen/font_17"/>
 
         <EditText
@@ -86,6 +88,7 @@
             android:layout_marginLeft="@dimen/gap_20"
             android:background="@null"
             android:hint="@string/edit_confirm_password"
+            android:inputType="textPassword"
             android:textSize="@dimen/font_15"/>
 
     </LinearLayout>

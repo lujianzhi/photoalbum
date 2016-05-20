@@ -27,7 +27,6 @@ import com.lujianzhi.photoalbum.net.PhotoAlbumManager;
 import com.lujianzhi.photoalbum.net.networktask.INetWorkListener;
 import com.lujianzhi.photoalbum.ui.base.BaseActivity;
 import com.lujianzhi.photoalbum.ui.viewpager.HackyViewPager;
-import com.lujianzhi.photoalbum.utils.LogUtils;
 import com.lujianzhi.photoalbum.utils.ToastUtils;
 import com.lujianzhi.photoalbum.view.MyVoteDialog;
 import com.lujianzhi.photoalbum.view.photoview.PhotoView;
@@ -147,7 +146,9 @@ public class PhotoActivity extends BaseActivity {
         Bundle data = getIntent().getBundleExtra("data");
         photoPosition = data.getInt("position");
         photoList = data.getParcelableArrayList("photoList");
-        commentList = photoList.get(photoPosition).getComment();
+        if (photoList != null) {
+            commentList = photoList.get(photoPosition).getComment();
+        }
     }
 
     @Override
@@ -165,7 +166,6 @@ public class PhotoActivity extends BaseActivity {
                     @Override
                     public <T> void onSuccess(ResponseInfo<T> responseInfo) {
                         String jsonStr = responseInfo.result.toString();
-                        LogUtils.i(TAG, jsonStr);
 
                         if (PhotoAlbumManager.getInstance().parserVote(jsonStr) == 1) {
                             float newRate = PhotoAlbumManager.getInstance().parserVotePoint(jsonStr);
@@ -264,7 +264,7 @@ public class PhotoActivity extends BaseActivity {
 
         @Override
         public MyViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-            View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.comment_item, null);
+            View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.comment_item, parent, false);
             return new MyViewHolder(view);
         }
 

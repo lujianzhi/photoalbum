@@ -7,6 +7,6 @@
         android:id="@+id/photo"
         android:layout_width="@dimen/gap_100"
         android:layout_height="@dimen/gap_100"
-        android:src="@drawable/photo"/>
+        android:src="@drawable/default_photo"/>
 
 </LinearLayout>

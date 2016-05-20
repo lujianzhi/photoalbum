@@ -1,13 +1,10 @@
 package com.lujianzhi.photoalbum.ui;
 
-import android.app.Activity;
 import android.content.Intent;
-import android.database.Cursor;
-import android.net.Uri;
 import android.os.Bundle;
-import android.provider.MediaStore;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -26,10 +23,13 @@ import com.lujianzhi.photoalbum.entity.Photo;
 import com.lujianzhi.photoalbum.net.PhotoAlbumManager;
 import com.lujianzhi.photoalbum.net.networktask.INetWorkListener;
 import com.lujianzhi.photoalbum.ui.base.BaseActivity;
+import com.lujianzhi.photoalbum.utils.GlideLoader;
 import com.lujianzhi.photoalbum.utils.LogUtils;
 import com.lujianzhi.photoalbum.utils.ToastUtils;
-import com.lujianzhi.photoalbum.view.MyConfirmDialog;
 import com.lujianzhi.photoalbum.view.MyLongPressDialog;
+import com.yancy.imageselector.ImageConfig;
+import com.yancy.imageselector.ImageSelector;
+import com.yancy.imageselector.ImageSelectorActivity;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -45,6 +45,7 @@ public class PhotoAlbumActivity extends BaseActivity {
     private String albumName;
     private int albumId;
     private PhotoRVAdapter adapter;
+    private boolean isMe;
 
     public static final int SYSTEM_GARRLY_REQUEST_CODE = 100;
 
@@ -80,6 +81,9 @@ public class PhotoAlbumActivity extends BaseActivity {
         comment.setVisibility(View.GONE);
         back.setOnClickListener(getOnClickListener());
         add.setOnClickListener(getOnClickListener());
+        if (isMe) {
+            add.setVisibility(View.VISIBLE);
+        }
     }
 
     @Override
@@ -87,6 +91,7 @@ public class PhotoAlbumActivity extends BaseActivity {
         Bundle data = getIntent().getBundleExtra("data");
         albumName = data.getString("albumName");
         albumId = data.getInt("albumId");
+        isMe = data.getBoolean("isMe", false);
     }
 
     @Override
@@ -104,55 +109,70 @@ public class PhotoAlbumActivity extends BaseActivity {
     }
 
     private void addPhoto() {
-        Intent systemGalleryIntent = new Intent(Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-        startActivityForResult(systemGalleryIntent, PhotoAlbumActivity.SYSTEM_GARRLY_REQUEST_CODE);
+        /**
+         * 初始化图片选择器
+         */
+        ImageConfig imageConfig
+                = new ImageConfig.Builder(new GlideLoader())
+                .steepToolBarColor(getResources().getColor(R.color.color11))
+                .titleBgColor(getResources().getColor(R.color.color11))
+                .titleSubmitTextColor(getResources().getColor(R.color.color5))
+                .titleTextColor(getResources().getColor(R.color.color5))
+                // 开启多选   （默认为多选）
+                .mutiSelect()
+                // 多选时的最大数量   （默认 9 张）
+                .mutiSelectMaxSize(9)
+                // 开启拍照功能 （默认关闭）
+                .showCamera()
+                // 拍照后存放的图片路径（默认 /temp/picture） （会自动创建）
+                .filePath("/PhotoAlbum/Pictures")
+                .requestCode(ImageSelector.IMAGE_REQUEST_CODE)
+                .build();
+        ImageSelector.open(PhotoAlbumActivity.this, imageConfig);
     }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, final Intent data) {
-        if (requestCode == PhotoAlbumActivity.SYSTEM_GARRLY_REQUEST_CODE && resultCode == Activity.RESULT_OK && data != null) {
-            MyConfirmDialog dialog = new MyConfirmDialog(PhotoAlbumActivity.this);
-            dialog.setPositiveClickListener(new MyConfirmDialog.IMyClickListener() {
-                @Override
-                public void onClick() {
 
-                    Uri selectedImage = data.getData();
-                    String[] filePathColumn = {MediaStore.Images.Media.DATA};
-                    Cursor cursor = getContentResolver().query(selectedImage,
-                            filePathColumn, null, null, null);
-                    if (cursor != null) {
-                        cursor.moveToFirst();
-                        int columnIndex = cursor.getColumnIndex(filePathColumn[0]);
-                        String picturePath = cursor.getString(columnIndex);
-                        String[] pics = picturePath.split("/");
-                        File file = new File(picturePath);
+        if (requestCode == ImageSelector.IMAGE_REQUEST_CODE && resultCode == RESULT_OK && data != null) {
+            //照片路径
+            List<String> pathList = data.getStringArrayListExtra(ImageSelectorActivity.EXTRA_RESULT);
+            for (final String path : pathList) {
+                new Thread() {
+                    @Override
+                    public void run() {
+                        try {
+                            Log.i(TAG, path);
+                            String[] pics = path.split("/");
+                            LogUtils.i(TAG, pics[pics.length - 1]);
+                            File file = new File(path);
+                            PhotoAlbumManager.getInstance().addPhotoRequest(String.valueOf(albumId), file, pics[pics.length - 1], new INetWorkListener() {
+                                @Override
+                                public <T> void onSuccess(ResponseInfo<T> responseInfo) {
+                                    String resultStr = responseInfo.result.toString();
 
-                        PhotoAlbumManager.getInstance().addPhotoRequest(String.valueOf(albumId), file, pics[pics.length - 1], new INetWorkListener() {
-                            @Override
-                            public <T> void onSuccess(ResponseInfo<T> responseInfo) {
-                                String resultStr = responseInfo.result.toString();
-                                LogUtils.i(TAG, " photo/upload.do : " + resultStr);
-
-                                if (PhotoAlbumManager.getInstance().parserAddPhoto(resultStr) == 1) {
-                                    ToastUtils.showShortToast("保存相片成功");
-                                    adapter.addData(PhotoAlbumManager.getInstance().parserSinglePhoto(resultStr));
-                                    adapter.notifyDataSetChanged();
-                                } else {
-                                    ToastUtils.showShortToast("保存相片失败");
+                                    if (PhotoAlbumManager.getInstance().parserAddPhoto(resultStr) == 1) {
+                                        //TODO 上传成功时，只需要返回刚才新添加的照片信息，而不是所有已有照片信息
+                                        adapter.addData(PhotoAlbumManager.getInstance().parserSinglePhoto(resultStr));
+                                        adapter.notifyDataSetChanged();
+                                    } else {
+                                        ToastUtils.showShortToast("保存相片失败");
+                                    }
                                 }
-                            }
 
-                            @Override
-                            public void onFailure(HttpException error, String msg) {
-                                LogUtils.i(TAG, " photo/upload.do error-msg : " + msg);
-                            }
-                        });
-                        cursor.close();
+                                @Override
+                                public void onFailure(HttpException error, String msg) {
+                                    LogUtils.i(TAG, " photo/upload.do error-msg : " + msg);
+                                }
+                            });
+                            sleep(1000);
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
                     }
+                }.start();
+            }
 
-                }
-            });
-            dialog.show();
         }
     }
 
@@ -181,13 +201,9 @@ public class PhotoAlbumActivity extends BaseActivity {
             PhotoAlbumManager.getInstance().setPhotos((ArrayList<Photo>) photos);
         }
 
-        public void clearData() {
-            PhotoAlbumManager.getInstance().clearPhoto();
-        }
-
         @Override
         public MyViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-            View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.photo_item, null);
+            View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.photo_item, parent, false);
             return new MyViewHolder(view);
         }
 
@@ -212,54 +228,56 @@ public class PhotoAlbumActivity extends BaseActivity {
                 }
             });
 
-            holder.itemView.setOnLongClickListener(new View.OnLongClickListener() {
-                @Override
-                public boolean onLongClick(View v) {
-                    MyLongPressDialog dialog = new MyLongPressDialog(PhotoAlbumActivity.this);
-                    dialog.setDeleteVisisble();
-                    dialog.setCoverVisisble();
-                    dialog.setSetCoverClickListener(new MyLongPressDialog.IMyClickListener() {
-                        @Override
-                        public void onClick() {
-                            PhotoAlbumManager.getInstance().setCoverRequest(String.valueOf(photo.getPhotoUrl()), albumId, new INetWorkListener() {
-                                @Override
-                                public <T> void onSuccess(ResponseInfo<T> responseInfo) {
-                                    String jsonStr = responseInfo.result.toString();
-                                    PhotoAlbumManager.getInstance().parseCoverUrl(jsonStr);
-                                }
-
-                                @Override
-                                public void onFailure(HttpException error, String msg) {
-
-                                }
-                            });
-                        }
-                    });
-                    dialog.setDeleteClickListener(new MyLongPressDialog.IMyClickListener() {
-                        @Override
-                        public void onClick() {
-                            PhotoAlbumManager.getInstance().deletePhotoRequest(String.valueOf(photo.getId()), String.valueOf(photo.getBelongId()), new INetWorkListener() {
-                                @Override
-                                public <T> void onSuccess(ResponseInfo<T> responseInfo) {
-                                    String jsonStr = responseInfo.result.toString();
-                                    if (PhotoAlbumManager.getInstance().parserDeleteAlbum(jsonStr) == 1) {
-                                        PhotoAlbumManager.getInstance().clearPhotoAlbum();
-                                        adapter.setData(PhotoAlbumManager.getInstance().parserAllDeletePhoto2(jsonStr));
-                                        adapter.notifyDataSetChanged();
+            if (isMe) {
+                holder.itemView.setOnLongClickListener(new View.OnLongClickListener() {
+                    @Override
+                    public boolean onLongClick(View v) {
+                        MyLongPressDialog dialog = new MyLongPressDialog(PhotoAlbumActivity.this);
+                        dialog.setDeleteVisisble();
+                        dialog.setCoverVisisble();
+                        dialog.setSetCoverClickListener(new MyLongPressDialog.IMyClickListener() {
+                            @Override
+                            public void onClick() {
+                                PhotoAlbumManager.getInstance().setCoverRequest(String.valueOf(photo.getPhotoUrl()), albumId, new INetWorkListener() {
+                                    @Override
+                                    public <T> void onSuccess(ResponseInfo<T> responseInfo) {
+                                        String jsonStr = responseInfo.result.toString();
+                                        PhotoAlbumManager.getInstance().parseCoverUrl(jsonStr);
                                     }
-                                }
 
-                                @Override
-                                public void onFailure(HttpException error, String msg) {
+                                    @Override
+                                    public void onFailure(HttpException error, String msg) {
 
-                                }
-                            });
-                        }
-                    });
-                    dialog.show();
-                    return false;
-                }
-            });
+                                    }
+                                });
+                            }
+                        });
+                        dialog.setDeleteClickListener(new MyLongPressDialog.IMyClickListener() {
+                            @Override
+                            public void onClick() {
+                                PhotoAlbumManager.getInstance().deletePhotoRequest(String.valueOf(photo.getId()), String.valueOf(photo.getBelongId()), new INetWorkListener() {
+                                    @Override
+                                    public <T> void onSuccess(ResponseInfo<T> responseInfo) {
+                                        String jsonStr = responseInfo.result.toString();
+                                        if (PhotoAlbumManager.getInstance().parserDeleteAlbum(jsonStr) == 1) {
+                                            PhotoAlbumManager.getInstance().clearPhotoAlbum();
+                                            adapter.setData(PhotoAlbumManager.getInstance().parserAllDeletePhoto2(jsonStr));
+                                            adapter.notifyDataSetChanged();
+                                        }
+                                    }
+
+                                    @Override
+                                    public void onFailure(HttpException error, String msg) {
+
+                                    }
+                                });
+                            }
+                        });
+                        dialog.show();
+                        return false;
+                    }
+                });
+            }
 
         }
 
@@ -286,7 +304,6 @@ public class PhotoAlbumActivity extends BaseActivity {
             @Override
             public <T> void onSuccess(ResponseInfo<T> responseInfo) {
                 String resultStr = responseInfo.result.toString();
-                LogUtils.i(TAG, " photo/findAll.do : " + resultStr);
                 PhotoAlbumManager.getInstance().clearPhoto();
                 adapter.setData(PhotoAlbumManager.getInstance().parserAllPhoto(resultStr));
                 adapter.notifyDataSetChanged();
@@ -298,4 +315,5 @@ public class PhotoAlbumActivity extends BaseActivity {
             }
         });
     }
+
 }

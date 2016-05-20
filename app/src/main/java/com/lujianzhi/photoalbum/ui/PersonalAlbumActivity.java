@@ -11,7 +11,7 @@ import com.lidroid.xutils.http.ResponseInfo;
 import com.lujianzhi.photoalbum.R;
 import com.lujianzhi.photoalbum.net.PhotoAlbumManager;
 import com.lujianzhi.photoalbum.net.networktask.INetWorkListener;
-import com.lujianzhi.photoalbum.utils.LogUtils;
+import com.lujianzhi.photoalbum.view.MyAddAlbumDialog;
 
 /**
  * Created by Lawson on 2016/5/15.
@@ -31,9 +31,18 @@ public class PersonalAlbumActivity extends HomeActivity {
     }
 
     @Override
+    protected void initBottomViews() {
+        super.initBottomViews();
+        ImageView add = (ImageView) bottom.findViewById(R.id.add);
+        add.setOnClickListener(getOnClickListener());
+        add.setVisibility(View.VISIBLE);
+    }
+
+    @Override
     protected void initViews() {
         super.initViews();
         isNeedParentResume = false;
+        isMe = true;
     }
 
     @Override
@@ -53,6 +62,33 @@ public class PersonalAlbumActivity extends HomeActivity {
         }
     }
 
+    protected void showAddPhotoAlbum() {
+        final MyAddAlbumDialog dialog = new MyAddAlbumDialog(this);
+        dialog.setPositiveClickListener(new MyAddAlbumDialog.IMyClickListener() {
+            @Override
+            public void onClick() {
+                PhotoAlbumManager.getInstance().addPhotoAlbumRequest(dialog.getAddAlbumName(), dialog.getAddAlbumType(), new INetWorkListener() {
+                    @Override
+                    public <T> void onSuccess(ResponseInfo<T> responseInfo) {
+                        String responseStr = responseInfo.result.toString();
+
+                        if (PhotoAlbumManager.getInstance().parserAddAlbum(responseStr) == 1) {
+                            adapter.addData(PhotoAlbumManager.getInstance().parserSingleAlbum(responseStr));
+                            adapter.notifyDataSetChanged();
+                        }
+
+                    }
+
+                    @Override
+                    public void onFailure(HttpException error, String msg) {
+                    }
+                });
+
+            }
+        });
+        dialog.show();
+    }
+
     @Override
     protected void isExit() {
         finish();
@@ -61,11 +97,10 @@ public class PersonalAlbumActivity extends HomeActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        PhotoAlbumManager.getInstance().getUserAlbumsRequest(new INetWorkListener() {
+        PhotoAlbumManager.getInstance().getAlbumsRequest(new INetWorkListener() {
             @Override
             public <T> void onSuccess(ResponseInfo<T> responseInfo) {
                 String jsonStr = responseInfo.result.toString();
-                LogUtils.i(TAG, " album/findUserAll.do : " + jsonStr);
                 PhotoAlbumManager.getInstance().clearPhotoAlbum();
                 adapter.setData(PhotoAlbumManager.getInstance().parserAllAlbum(jsonStr));
                 adapter.notifyDataSetChanged();

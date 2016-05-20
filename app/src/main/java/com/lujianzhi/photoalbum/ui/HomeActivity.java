@@ -26,8 +26,6 @@ import com.lujianzhi.photoalbum.entity.PhotoAlbum;
 import com.lujianzhi.photoalbum.net.PhotoAlbumManager;
 import com.lujianzhi.photoalbum.net.networktask.INetWorkListener;
 import com.lujianzhi.photoalbum.ui.base.BaseActivity;
-import com.lujianzhi.photoalbum.utils.LogUtils;
-import com.lujianzhi.photoalbum.view.MyAddAlbumDialog;
 import com.lujianzhi.photoalbum.view.MyLongPressDialog;
 
 import java.util.ArrayList;
@@ -46,6 +44,9 @@ public class HomeActivity extends BaseActivity {
     };
     protected PhotoAlbumRVAdapter adapter;
     protected boolean isNeedParentResume = true;
+    protected boolean isMe;
+
+    protected LinearLayout bottom;
 
     @Override
     public void onClick(View v) {
@@ -55,9 +56,6 @@ public class HomeActivity extends BaseActivity {
                 break;
             case R.id.back:
                 isExit();
-                break;
-            case R.id.add:
-                showAddPhotoAlbum();
                 break;
             default:
                 break;
@@ -79,6 +77,9 @@ public class HomeActivity extends BaseActivity {
 
     @Override
     protected void initViews() {
+        Intent intent = new Intent("com.lujianzhi.photoalbum.service.MusicService");
+        intent.setPackage(getPackageName());
+        startService(intent);
         photoAlbumView = (RecyclerView) findViewById(R.id.photo_album);
         photoAlbumView.setLayoutManager(new GridLayoutManager(this, 2));
         SpacesItemDecoration decoration = new SpacesItemDecoration(16);
@@ -89,12 +90,10 @@ public class HomeActivity extends BaseActivity {
 
     @Override
     protected void initBottomViews() {
-        LinearLayout bottom = (LinearLayout) findViewById(R.id.bottom);
+        bottom = (LinearLayout) findViewById(R.id.bottom);
         ImageView back = (ImageView) bottom.findViewById(R.id.back);
-        ImageView add = (ImageView) bottom.findViewById(R.id.add);
         ImageView comment = (ImageView) bottom.findViewById(R.id.comment);
         back.setOnClickListener(getOnClickListener());
-        add.setOnClickListener(getOnClickListener());
         comment.setVisibility(View.GONE);
     }
 
@@ -110,34 +109,6 @@ public class HomeActivity extends BaseActivity {
 
     @Override
     protected void initData() {
-    }
-
-    protected void showAddPhotoAlbum() {
-        final MyAddAlbumDialog dialog = new MyAddAlbumDialog(this);
-        dialog.setPositiveClickListener(new MyAddAlbumDialog.IMyClickListener() {
-            @Override
-            public void onClick() {
-                PhotoAlbumManager.getInstance().addPhotoAlbumRequest(dialog.getAddAlbumName(), dialog.getAddAlbumType(), new INetWorkListener() {
-                    @Override
-                    public <T> void onSuccess(ResponseInfo<T> responseInfo) {
-                        String responseStr = responseInfo.result.toString();
-                        LogUtils.i(TAG, " album/add.do : " + responseStr);
-
-                        if (PhotoAlbumManager.getInstance().parserAddAlbum(responseStr) == 1) {
-                            adapter.addData(PhotoAlbumManager.getInstance().parserSingleAlbum(responseStr));
-                            adapter.notifyDataSetChanged();
-                        }
-
-                    }
-
-                    @Override
-                    public void onFailure(HttpException error, String msg) {
-                    }
-                });
-
-            }
-        });
-        dialog.show();
     }
 
     @Override
@@ -183,9 +154,9 @@ public class HomeActivity extends BaseActivity {
             if (!"null".equals(photoAlbum.getCoverUrl())) {
                 Glide.with(HomeActivity.this).load(NetWorkConfig.getHttpApiPath() + photoAlbum.getCoverUrl()).into(holder.albumCover);
             } else {
-                holder.albumCover.setImageResource(R.drawable.cover);
+                holder.albumCover.setImageResource(R.drawable.default_photo);
             }
-            if (photoAlbum.getType() == 1) {
+            if (photoAlbum.getType() == 0) {
                 holder.albumName.setTextColor(Color.RED);
             } else {
                 holder.albumName.setTextColor(Color.BLACK);
@@ -199,6 +170,7 @@ public class HomeActivity extends BaseActivity {
                     Bundle data = new Bundle();
                     data.putString("albumName", photoAlbum.getName());
                     data.putInt("albumId", photoAlbum.getId());
+                    data.putBoolean("isMe", isMe);
                     intent.putExtra("data", data);
                     startActivity(intent);
                 }
@@ -260,12 +232,11 @@ public class HomeActivity extends BaseActivity {
     protected void onResume() {
         super.onResume();
 
-        if(isNeedParentResume){
-            PhotoAlbumManager.getInstance().getAlbumsRequest(new INetWorkListener() {
+        if (isNeedParentResume) {
+            PhotoAlbumManager.getInstance().getFindAllUserAlbum(new INetWorkListener() {
                 @Override
                 public <T> void onSuccess(ResponseInfo<T> responseInfo) {
                     String jsonStr = responseInfo.result.toString();
-                    LogUtils.i(TAG, " album/findAll.do : " + jsonStr);
                     PhotoAlbumManager.getInstance().clearPhotoAlbum();
                     adapter.setData(PhotoAlbumManager.getInstance().parserAllAlbum(jsonStr));
                     adapter.notifyDataSetChanged();

@@ -18,8 +18,7 @@ public class BaseParser {
                     // 弹出显示错误信息
                     ToastUtils.showShortToast(obj.getString("message"));
                     return "";
-                }
-                if (code == 1) {
+                } else if (code == 1) {
                     if (obj.has("message")) {
                         message = obj.getString("message");
                     } else {

@@ -53,7 +53,6 @@ public class UserManager {
             @Override
             public <T> void onSuccess(ResponseInfo<T> responseInfo) {
                 String responseStr = responseInfo.result.toString();
-                LogUtils.i(TAG, responseStr);
 
                 if (PhotoAlbumManager.getInstance().parseRegisterStatues(responseStr) == 1) {
                     dialog.dismiss();
