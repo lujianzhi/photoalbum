@@ -30,7 +30,7 @@ public class MusicService extends Service {
             mediaPlayer = new MediaPlayer();
             AssetFileDescriptor afd = getAssets().openFd("kisstherain.mp3");
             mediaPlayer.setDataSource(afd.getFileDescriptor(), afd.getStartOffset(), afd.getLength());
-            mediaPlayer.prepareAsync();
+            mediaPlayer.prepare();
             mediaPlayer.setLooping(true);
             mediaPlayer.start();
         } catch (IOException e) {

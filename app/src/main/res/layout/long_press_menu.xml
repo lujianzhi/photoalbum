@@ -6,6 +6,17 @@
               android:orientation="vertical">
 
     <TextView
+        android:id="@+id/download"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingBottom="@dimen/gap_10"
+        android:paddingLeft="@dimen/gap_30"
+        android:paddingRight="@dimen/gap_30"
+        android:paddingTop="@dimen/gap_10"
+        android:text="@string/context_menu_download"
+        android:textSize="@dimen/font_20"/>
+
+    <TextView
         android:id="@+id/delete"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

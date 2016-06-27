@@ -45,6 +45,7 @@ public class HomeActivity extends BaseActivity {
     protected PhotoAlbumRVAdapter adapter;
     protected boolean isNeedParentResume = true;
     protected boolean isMe;
+    protected boolean isFirst = true;
 
     protected LinearLayout bottom;
 
@@ -77,9 +78,11 @@ public class HomeActivity extends BaseActivity {
 
     @Override
     protected void initViews() {
-        Intent intent = new Intent("com.lujianzhi.photoalbum.service.MusicService");
-        intent.setPackage(getPackageName());
-        startService(intent);
+        if(isFirst){
+            Intent intent = new Intent("com.lujianzhi.photoalbum.service.MusicService");
+            intent.setPackage(getPackageName());
+            startService(intent);
+        }
         photoAlbumView = (RecyclerView) findViewById(R.id.photo_album);
         photoAlbumView.setLayoutManager(new GridLayoutManager(this, 2));
         SpacesItemDecoration decoration = new SpacesItemDecoration(16);
@@ -118,6 +121,9 @@ public class HomeActivity extends BaseActivity {
 
     protected void isExit() {
         if (isFinish) {
+            Intent intent = new Intent("com.lujianzhi.photoalbum.service.MusicService");
+            intent.setPackage(getPackageName());
+            stopService(intent);
             finish();
         } else {
             Toast.makeText(this, R.string.confirm_logout, Toast.LENGTH_SHORT).show();
@@ -176,36 +182,39 @@ public class HomeActivity extends BaseActivity {
                 }
             });
 
-            holder.itemView.setOnLongClickListener(new View.OnLongClickListener() {
-                @Override
-                public boolean onLongClick(View v) {
-                    MyLongPressDialog dialog = new MyLongPressDialog(HomeActivity.this);
-                    dialog.setDeleteVisisble();
-                    dialog.setDeleteClickListener(new MyLongPressDialog.IMyClickListener() {
-                        @Override
-                        public void onClick() {
-                            PhotoAlbumManager.getInstance().deleteAlbumRequest(String.valueOf(photoAlbum.getId()), new INetWorkListener() {
-                                @Override
-                                public <T> void onSuccess(ResponseInfo<T> responseInfo) {
-                                    String jsonStr = responseInfo.result.toString();
-                                    if (PhotoAlbumManager.getInstance().parserDeleteAlbum(jsonStr) == 1) {
-                                        PhotoAlbumManager.getInstance().clearPhotoAlbum();
-                                        adapter.setData(PhotoAlbumManager.getInstance().parserAllDeletePhoto(jsonStr));
-                                        adapter.notifyDataSetChanged();
+            if (isMe) {
+                holder.itemView.setOnLongClickListener(new View.OnLongClickListener() {
+                    @Override
+                    public boolean onLongClick(View v) {
+                        MyLongPressDialog dialog = new MyLongPressDialog(HomeActivity.this);
+                        dialog.setDeleteVisible();
+                        dialog.setDownloadGone();
+                        dialog.setDeleteClickListener(new MyLongPressDialog.IMyClickListener() {
+                            @Override
+                            public void onClick() {
+                                PhotoAlbumManager.getInstance().deleteAlbumRequest(String.valueOf(photoAlbum.getId()), new INetWorkListener() {
+                                    @Override
+                                    public <T> void onSuccess(ResponseInfo<T> responseInfo) {
+                                        String jsonStr = responseInfo.result.toString();
+                                        if (PhotoAlbumManager.getInstance().parserDeleteAlbum(jsonStr) == 1) {
+                                            PhotoAlbumManager.getInstance().clearPhotoAlbum();
+                                            adapter.setData(PhotoAlbumManager.getInstance().parserAllDeletePhoto(jsonStr));
+                                            adapter.notifyDataSetChanged();
+                                        }
                                     }
-                                }
 
-                                @Override
-                                public void onFailure(HttpException error, String msg) {
+                                    @Override
+                                    public void onFailure(HttpException error, String msg) {
 
-                                }
-                            });
-                        }
-                    });
-                    dialog.show();
-                    return false;
-                }
-            });
+                                    }
+                                });
+                            }
+                        });
+                        dialog.show();
+                        return false;
+                    }
+                });
+            }
 
 
         }

@@ -83,6 +83,7 @@
     <!--长按菜单-->
     <string name="context_menu_set_cover">设置封面</string>
     <string name="context_menu_delete">删除</string>
+    <string name="context_menu_download">下载</string>
 
     <!--投票-->
     <string name="vote_tip">请投票,这张照片您想投几票?</string>

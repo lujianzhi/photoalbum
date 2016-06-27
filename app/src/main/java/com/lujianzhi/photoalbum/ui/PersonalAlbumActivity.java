@@ -40,9 +40,10 @@ public class PersonalAlbumActivity extends HomeActivity {
 
     @Override
     protected void initViews() {
-        super.initViews();
         isNeedParentResume = false;
         isMe = true;
+        isFirst = false;
+        super.initViews();
     }
 
     @Override

@@ -1,5 +1,6 @@
 package com.lujianzhi.photoalbum.ui;
 
+import android.app.Dialog;
 import android.content.Intent;
 import android.util.Log;
 import android.view.View;
@@ -108,47 +109,60 @@ public class LoginActivity extends BaseActivity {
 //            }
 //        });
 
-        final HttpUtils httpUtils = new HttpUtils(5000);
-        RequestParams params = new RequestParams();
-        params.addBodyParameter("userName", user.getUserName());
-        params.addBodyParameter("password", user.getPassword());
-        httpUtils.send(HttpRequest.HttpMethod.POST, NetWorkConfig.getHttpApiPath() + "/login/login.do", params, new RequestCallBack<Object>() {
-            @Override
-            public void onSuccess(ResponseInfo<Object> responseInfo) {
-                String respondStr = responseInfo.result.toString();
-                LogUtils.i(TAG, respondStr);
+        if ("".equals(user.getUserName()) || "".equals(user.getPassword())) {
+            ToastUtils.showShortToast("填写完整信息");
+        } else {
+            final Dialog dialog = new Dialog(this);
+            dialog.setTitle("正在登陆");
+            dialog.setCancelable(false);
+            dialog.setCanceledOnTouchOutside(false);
+            dialog.show();
 
-                DefaultHttpClient dh = (DefaultHttpClient) httpUtils.getHttpClient();
-                MyCookieStore.cookieStore = dh.getCookieStore();
-                CookieStore cs = dh.getCookieStore();
-                List<Cookie> cookies = cs.getCookies();
-                String aa = null;
-                for (int i = 0; i < cookies.size(); i++) {
-                    if ("JSESSIONID".equals(cookies.get(i).getName())) {
-                        aa = cookies.get(i).getValue();
-                        break;
+            final HttpUtils httpUtils = new HttpUtils(10000);
+            RequestParams params = new RequestParams();
+            params.addBodyParameter("userName", user.getUserName());
+            params.addBodyParameter("password", user.getPassword());
+            httpUtils.send(HttpRequest.HttpMethod.POST, NetWorkConfig.getHttpApiPath() + "/login/login.do", params, new RequestCallBack<Object>() {
+                @Override
+                public void onSuccess(ResponseInfo<Object> responseInfo) {
+                    String respondStr = responseInfo.result.toString();
+                    LogUtils.i(TAG, respondStr);
+
+                    DefaultHttpClient dh = (DefaultHttpClient) httpUtils.getHttpClient();
+                    MyCookieStore.cookieStore = dh.getCookieStore();
+                    CookieStore cs = dh.getCookieStore();
+                    List<Cookie> cookies = cs.getCookies();
+                    String aa = null;
+                    for (int i = 0; i < cookies.size(); i++) {
+                        if ("JSESSIONID".equals(cookies.get(i).getName())) {
+                            aa = cookies.get(i).getValue();
+                            break;
+                        }
+                    }
+                    Log.i("lawson", "比较sessionid" + aa);
+
+                    dialog.dismiss();
+
+                    if (PhotoAlbumManager.getInstance().parserLogin(respondStr) == 1) {
+                        Intent intent = new Intent(LoginActivity.this, HomeActivity.class);
+                        startActivity(intent);
+                        //TODO 每次都为false
+                        LoginActivity.loginState = false;
+                        SharedPreferencesUtils.recordLoginState(LoginActivity.this, LoginActivity.loginState);
+                        finish();
                     }
                 }
-                Log.i("lawson", "比较sessionid" + aa);
 
-
-                if (PhotoAlbumManager.getInstance().parserLogin(respondStr) == 1) {
-                    Intent intent = new Intent(LoginActivity.this, HomeActivity.class);
-                    startActivity(intent);
-                    //TODO 每次都为false
+                @Override
+                public void onFailure(HttpException e, String s) {
                     LoginActivity.loginState = false;
                     SharedPreferencesUtils.recordLoginState(LoginActivity.this, LoginActivity.loginState);
-                    finish();
+                    ToastUtils.showShortToast(R.string.net_request_failure);
+                    dialog.dismiss();
                 }
-            }
+            });
+        }
 
-            @Override
-            public void onFailure(HttpException e, String s) {
-                LoginActivity.loginState = false;
-                SharedPreferencesUtils.recordLoginState(LoginActivity.this, LoginActivity.loginState);
-                ToastUtils.showShortToast(R.string.net_request_failure);
-            }
-        });
     }
 
     private void register() {

@@ -12,7 +12,7 @@ public class NetWorkConfig {
     /**
      * 电脑ip
      */
-    public static final String ip = "192.168.1.104/";
+    public static final String ip = "192.168.176.1:8080/";
 
     /**
      * 中间路径

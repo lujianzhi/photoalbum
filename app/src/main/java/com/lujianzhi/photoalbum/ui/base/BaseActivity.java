@@ -1,6 +1,7 @@
 package com.lujianzhi.photoalbum.ui.base;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 
@@ -93,4 +94,11 @@ public abstract class BaseActivity extends Activity implements View.OnClickListe
         return this;
     }
 
+    @Override
+    protected void onStop() {
+        super.onStop();
+        Intent intent = new Intent("com.lujianzhi.photoalbum.service.MusicService");
+        intent.setPackage(getPackageName());
+        stopService(intent);
+    }
 }

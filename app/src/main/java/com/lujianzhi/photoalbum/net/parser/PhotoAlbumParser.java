@@ -262,7 +262,6 @@ public class PhotoAlbumParser extends BaseParser {
     }
 
     public int parserAddAlbum(String jsonStr) {
-        ToastUtils.showShortToast(parseMessage(jsonStr));
         return parseCode(jsonStr);
     }
 

@@ -19,9 +19,11 @@ public class MyLongPressDialog extends Dialog {
     private View popView;
     private TextView set_cover;
     private TextView delete;
+    private TextView download;
 
     private IMyClickListener myDeleteListener;
     private IMyClickListener mySetCoverListener;
+    private IMyClickListener myDownloadListener;
 
     public MyLongPressDialog(Context context) {
         super(context, R.style.emptyDialog);
@@ -34,18 +36,23 @@ public class MyLongPressDialog extends Dialog {
     }
 
     private void initView() {
+        download = (TextView) popView.findViewById(R.id.download);
         delete = (TextView) popView.findViewById(R.id.delete);
         set_cover = (TextView) popView.findViewById(R.id.set_cover);
         delete.setVisibility(View.GONE);
         set_cover.setVisibility(View.GONE);
     }
 
-    public void setDeleteVisisble() {
+    public void setDeleteVisible() {
         delete.setVisibility(View.VISIBLE);
     }
 
-    public void setCoverVisisble() {
+    public void setCoverVisible() {
         set_cover.setVisibility(View.VISIBLE);
+    }
+
+    public void setDownloadGone() {
+        download.setVisibility(View.GONE);
     }
 
     public void setDeleteClickListener(IMyClickListener myClickListener) {
@@ -54,6 +61,10 @@ public class MyLongPressDialog extends Dialog {
 
     public void setSetCoverClickListener(IMyClickListener mySetCoverListener) {
         this.mySetCoverListener = mySetCoverListener;
+    }
+
+    public void setMyDownloadListener(IMyClickListener myDownloadListener) {
+        this.myDownloadListener = myDownloadListener;
     }
 
     private void initClickListener() {
@@ -70,6 +81,14 @@ public class MyLongPressDialog extends Dialog {
             @Override
             public void onClick(View v) {
                 mySetCoverListener.onClick();
+                dismiss();
+            }
+        });
+
+        download.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                myDownloadListener.onClick();
                 dismiss();
             }
         });

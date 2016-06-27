@@ -20,7 +20,7 @@ public abstract class NetWorkTask {
 //    private PreferencesCookieStore cookieStore;
 
     public void sendHttpRequest() {
-        httpUtils = new HttpUtils();
+        httpUtils = new HttpUtils(10000);
         httpUtils.configCookieStore(MyCookieStore.cookieStore);
 //        cookieStore = new PreferencesCookieStore(MyApplication.getMyApplicationContext());
 //        httpUtils.configCookieStore(cookieStore);

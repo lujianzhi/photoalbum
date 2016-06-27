@@ -2,6 +2,7 @@ package com.lujianzhi.photoalbum.ui;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Environment;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -14,8 +15,10 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
+import com.lidroid.xutils.HttpUtils;
 import com.lidroid.xutils.exception.HttpException;
 import com.lidroid.xutils.http.ResponseInfo;
+import com.lidroid.xutils.http.callback.RequestCallBack;
 import com.lujianzhi.photoalbum.R;
 import com.lujianzhi.photoalbum.adapter.SpacesItemDecoration;
 import com.lujianzhi.photoalbum.config.NetWorkConfig;
@@ -152,7 +155,6 @@ public class PhotoAlbumActivity extends BaseActivity {
                                     String resultStr = responseInfo.result.toString();
 
                                     if (PhotoAlbumManager.getInstance().parserAddPhoto(resultStr) == 1) {
-                                        //TODO 上传成功时，只需要返回刚才新添加的照片信息，而不是所有已有照片信息
                                         adapter.addData(PhotoAlbumManager.getInstance().parserSinglePhoto(resultStr));
                                         adapter.notifyDataSetChanged();
                                     } else {
@@ -228,13 +230,37 @@ public class PhotoAlbumActivity extends BaseActivity {
                 }
             });
 
-            if (isMe) {
-                holder.itemView.setOnLongClickListener(new View.OnLongClickListener() {
-                    @Override
-                    public boolean onLongClick(View v) {
-                        MyLongPressDialog dialog = new MyLongPressDialog(PhotoAlbumActivity.this);
-                        dialog.setDeleteVisisble();
-                        dialog.setCoverVisisble();
+            holder.itemView.setOnLongClickListener(new View.OnLongClickListener() {
+                @Override
+                public boolean onLongClick(View v) {
+                    MyLongPressDialog dialog = new MyLongPressDialog(PhotoAlbumActivity.this);
+
+                    dialog.setMyDownloadListener(new MyLongPressDialog.IMyClickListener() {
+                        @Override
+                        public void onClick() {
+                            HttpUtils httpUtils = new HttpUtils(10000);
+                            File path = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + File.separator + "MyPhotoAlbum");
+                            if (!path.exists()) {
+                                path.mkdir();
+                            }
+                            httpUtils.download(NetWorkConfig.getHttpApiPath() + photo.getPhotoUrl(), path.getAbsolutePath() + File.separator + photo.getName(), new RequestCallBack<File>() {
+                                @Override
+                                public void onSuccess(ResponseInfo<File> responseInfo) {
+                                    ToastUtils.showShortToast("下载成功");
+                                }
+
+                                @Override
+                                public void onFailure(HttpException e, String s) {
+                                    LogUtils.i("下载", e.getMessage());
+                                    ToastUtils.showShortToast("下载失败 : " + s);
+                                }
+                            });
+                        }
+                    });
+
+                    if (isMe) {
+                        dialog.setDeleteVisible();
+                        dialog.setCoverVisible();
                         dialog.setSetCoverClickListener(new MyLongPressDialog.IMyClickListener() {
                             @Override
                             public void onClick() {
@@ -273,11 +299,11 @@ public class PhotoAlbumActivity extends BaseActivity {
                                 });
                             }
                         });
-                        dialog.show();
-                        return false;
                     }
-                });
-            }
+                    dialog.show();
+                    return false;
+                }
+            });
 
         }
 
